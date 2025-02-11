@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+    color: white;
+  }
+  canvas {
+    width: 100vw;
+    height: 100vh;
+  }
+  #config {
+    background-color: rgba(0, 191, 255, 0.3);
+    border-radius: 10px;
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    min-width: 300px;
+    width: 300px;
+    max-width: calc(100vw - 50px);
+    min-height: 400px;
+    height: calc(100vh - 50px);
+    max-height: calc(100vh - 50px);
+    padding: 10px;
+    backdrop-filter: brightness(50%) blur(10px);
+    overflow: scroll;
+    resize: both;
+    box-sizing: border-box;
+  }
+  #paused {
+    position: absolute;
+    /* top: 50vh;
+    left: 50vw; */
+    top: 50vh;
+    left: 50vw;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 12pt;
+    transform: translate(-50%, -50%);
+    border-radius: 12pt;
+    backdrop-filter: brightness(50%) blur(10px);
+  }
+  #paused h1 {
+    font-size: 42pt;
+  }
+  p, h1 {
+    margin: 0;
+  }
+  #userCode {
+    box-sizing: border-box;
+    /* min-width: 280px;
+    max-width: calc(100%); */
+    /* min-height: 50vh; */
+    width: 100%;
+    /* height: 50vh; */
+    height: 380px;
+    resize: none;
+    margin-top: 10px;
+
+  }
+  #doNothing {
+    position: absolute;
+    top: -100px;
+    left: -100px;
+    /* visibility: hidden; */
+  }
+</style>
+<canvas id="glCanvas"></canvas>
+<script src="./gl.js"></script>
+<script src="./controlPanel.js"></script>
+<div id="paused" style="display: none;">
+  <h1>Paused</h1>
+</div>
+<div id="config">
+  <h1>Controls:</h1>
+  <p>W/A/S/D to move</p>
+  <p>E to elevate, Q to drop</p>
+  <p>Shift to speed up</p>
+  <p>Arrows to look</p>
+  <p>Click to look with mouse</p>
+  <p>P to pause, O to panic!</p>
+  <p>Space to toggle this menu</p>
+  <hr>
+  <h1>Runtime:</h1>
+  <p>Paused: <span class="display" ref="paused">false</span></p>
+  <button id="pauseButton" onclick="togglePause()">pause</button>
+  <button onclick="render()">render frame</button>
+  <button onclick="panic()">PANIC!</button>
+  <!-- <p>Render time: <span class="display" ref="renderTime">unset</span></p> -->
+  <p>Position: x: <span class="display" ref="posX">0</span>, y: <span class="display" ref="posY">0</span>, z: <span class="display" ref="posZ">0</span></p>
+  <p>Rotation: x: <span class="display" ref="rotX">0</span>, y: <span class="display" ref="rotY">0</span>, z: <span class="display" ref="rotZ">0</span></p>
+  <button onclick="resetPos()">reset position</button>
+  <button onclick="resetRot()">reset rotation</button>
+  <button onclick="setPos()">go to position</button>
+  <button onclick="setRot()">set rotation</button>
+  <button onclick="gridSnap()">snap</button>
+  <p>Auto move: </p>
+  <p>Forward:<input type="checkbox" autocomplete="off" onchange="autoMove.forward = this.checked">
+  Backward:<input type="checkbox" autocomplete="off" onchange="autoMove.backward = this.checked"></p>
+  <p>Left:<input type="checkbox" autocomplete="off" onchange="autoMove.left = this.checked">
+  Right:<input type="checkbox" autocomplete="off" onchange="autoMove.right = this.checked"></p>
+  <p>Up:<input type="checkbox" autocomplete="off" onchange="autoMove.up = this.checked">
+  Down:<input type="checkbox" autocomplete="off" onchange="autoMove.down = this.checked"></p>
+  <p>Speed:<input type="checkbox" autocomplete="off" onchange="autoMove.speed = this.checked"></p>
+  <button onclick="takeScreenshot()">take screenshot</button>
+  <button onclick="loadOptions()">reload settings</button>
+  <hr>
+  <h1>Parameters:</h1>
+  <div>
+    <p>resolution: <span class="display" ref="resModifier">2</span></p>
+    <input class="setting" type="range" min="-3" max="2" value="-1" autocomplete="off" id="resModifier" oninput="update(this, 2 ** this.value)">
+    <p>render distance: <span class="display" ref="renderDist">128</span></p>
+    <input class="setting" type="range" min="4" max="13" value="7" autocomplete="off" id="renderDist" oninput="update(this, 2 ** this.value)">
+    <p>world resolution: <span class="display" ref="worldRes">128</span></p>
+    <input class="setting" type="range" min="0" max="4" value="0" autocomplete="off" id="worldRes" oninput="update(this, 2 ** this.value)">
+    <p>FOV: <span class="display" ref="fov">90</span></p>
+    <input class="setting" type="range" min="10" max="170" step="10" value="90" autocomplete="off" id="fov" oninput="update(this, this.value)">
+    <p>smoothed: <input class="setting" type="checkbox" autocomplete="off" id="smooth" onchange="update(this, this.checked)"></p>
+    <p>isometric: <input class="setting" type="checkbox" autocomplete="off" id="isoCam" onchange="update(this, this.checked); resetRot()"></p>
+    <p>move speed: <span class="display" ref="moveSpeed">4</span></p>
+    <input class="setting" type="range" min="0" max="8" value="2" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
+  </div>
+  <hr>
+  <h1>Shelved</h1>
+  <p>I made this project in about a weekend, which is the most work ive done in such a short period of time!</p>
+  <p>While giving me a much needed boost in confidence, it also means ive gotten burnt out of the project.</p>
+  <p>This project was really fun to work on, far exceeding my expectations of what I was trying to make, however I am a full time college student so I need to study.</p>
+  <p>For now, I made this world to be explored, I recommend keeping the world res at 1 without smoothing to see this the way I meant for it to be seen.</p>
+  <p>I may return to this project in the near future to add some things, notably a code editor to change the way the world is calculated.</p>
+  <p>Hope you enjoy -Kadin</p>
+  <a href="https://kadincool.github.io">kadincool.github.io</a>
+  <!-- <h1>Program:</h1>
+  <p>Editing: <span class="display" ref="currentFile">file</span></p>
+  <button onclick="makeShaderProgram()">run</button>
+  <button>save</button>
+  <button onclick="fetchFiles()">load</button>
+  <button>save as</button>
+  <button>import</button>
+  <button>export</button>
+  <textarea id="userCode" autocomplete="off"></textarea> -->
+</div>
+<button id="doNothing"></button>
