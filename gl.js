@@ -1,5 +1,6 @@
 const canvas = document.getElementById("glCanvas");
 const gl = canvas.getContext("webgl2");
+const userCode = document.getElementById("userCode");
 
 let corners = [
   -1, -1,
@@ -49,6 +50,7 @@ let options = {
   fov: 90,
   isoCam: false
 };
+let textAreaFocused = false;
 let mouseHover = false;
 let mouseLocked = false;
 let running = false;
@@ -265,6 +267,7 @@ function resetRot() {
 }
 
 function setRot() {
+  keys = {};
   camRot.x = Number(prompt("Rotation X:") || camRot.x);
   camRot.y = Number(prompt("Rotation Y:") || camRot.y);
   camRot.z = Number(prompt("Rotation Z:") || camRot.z);
@@ -309,15 +312,20 @@ async function saveFile(blob, name) {
 
 document.addEventListener("keydown", (e) => {
   if (mouseHover) keys[e.code] = true;
-  if (e.code == "KeyO") {
+  if (e.code == "KeyO" && e.ctrlKey) {
+    e.preventDefault();
     panic();
+  }
+  if (e.code == "KeyR" && e.ctrlKey) {
+    e.preventDefault();
+    fetchFiles();
   }
   if (e.code == "Space") {
     if (mouseHover) {
       togglePannel();
     }
   }
-  if (e.code == "KeyP") {
+  if (e.code == "KeyP" && mouseHover) {
     togglePause();
   }
 });
@@ -329,6 +337,7 @@ canvas.addEventListener("mousedown", (e) => {
 canvas.addEventListener("mouseenter", (e) => {
   mouseHover = true;
   document.getElementById("doNothing").focus();
+  textAreaFocused = false;
   // canvas.focus();
 });
 canvas.addEventListener("mouseleave", (e) => {mouseHover = false; keys = {};});
@@ -342,4 +351,8 @@ document.addEventListener("mousemove", (e) => {
     camRot.y += e.movementX * options.mouseSen / 100;
     camRot.x += e.movementY * options.mouseSen / 100;
   }
+});
+userCode.addEventListener("focus", (e) => {
+  textAreaFocused = true;
+  keys = {};
 });
