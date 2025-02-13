@@ -122,14 +122,20 @@ function quickSaveCode() {
   localStorage.setItem("autosave", userCode.value);
 }
 
-const sysFiles = ["autosave", "options", "programs", "editing"];
+const sysFiles = ["autosave", "options", "programs", "editing", "default"];
 
 function loadCode() {
   
 }
 
 function saveCode() {
-  
+  quickSaveCode();
+  let currentFile = localStorage.getItem("editing");
+  if (currentFile == "default") {
+    saveCodeAs();
+    return;
+  }
+  localStorage.setItem(currentFile, userCode.value);
 }
 
 function saveCodeAs() {
