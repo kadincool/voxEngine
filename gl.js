@@ -69,7 +69,6 @@ async function fetchFiles() {
   fshaderSrc = await fetch("./fshader.glsl").then((response) => response.text());
   fshaderSplit = fshaderSrc.split("// snip\r\n");
   quickLoadCode();
-  fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
   // console.log(fshaderSplit);
   compileProgram();
   running = true;

@@ -121,3 +121,35 @@ function quickLoadCode() {
 function quickSaveCode() {
   localStorage.setItem("autosave", userCode.value);
 }
+
+const sysFiles = ["autosave", "options", "programs", "editing"];
+
+function loadCode() {
+  
+}
+
+function saveCode() {
+  
+}
+
+function saveCodeAs() {
+  keys = {};
+  let loadedFileName = prompt("Enter name for program:");
+  let programs = JSON.parse(localStorage.getItem("programs"));
+  if (programs == null) {
+    programs = [];
+  }
+  if (!loadedFileName || sysFiles.includes(loadedFileName)) {
+    alert("name unavailable");
+    return;
+  }
+  if (programs.includes(loadedFileName) && !confirm("The program " + loadedFileName + " already exists, do you want to overwrite it?")) {
+    return;
+  } else if (!confirm("Confirm saving " + loadedFileName)) {
+    return;
+  }
+  localStorage.setItem("editing", loadedFileName);
+  programs.push(loadedFileName);
+  localStorage.setItem("programs", JSON.stringify(loadedFileName));
+
+}
