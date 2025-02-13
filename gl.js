@@ -1,6 +1,5 @@
 const canvas = document.getElementById("glCanvas");
 const gl = canvas.getContext("webgl2");
-const userCode = document.getElementById("userCode");
 
 let corners = [
   -1, -1,
@@ -33,8 +32,7 @@ let isometricUni;
 let posBuffer;
 let vertArray;
 
-let vshaderPre;
-let vshaderPost;
+let fshaderSplit;
 // program variables
 let camPos = {x: 0.0, y: 0.0, z: 0.0};
 let camRot = {x: 0.0, y: 0.0, z: 0.0};
@@ -66,12 +64,22 @@ let autoMove = {
 // let takeScreenshot = false;
 
 async function fetchFiles() {
+  // loadOptions();
   vshaderSrc = await fetch("./vshader.glsl").then((response) => response.text());
   fshaderSrc = await fetch("./fshader.glsl").then((response) => response.text());
-  makeShaderProgram();
+  fshaderSplit = fshaderSrc.split("// snip\r\n");
+  quickLoadCode();
+  fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
+  // console.log(fshaderSplit);
+  compileProgram();
   running = true;
 }
 fetchFiles();
+
+function compileProgram() {
+  fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
+  makeShaderProgram();
+}
 
 function makeShaderProgram() {
   let wasRunning = running;
@@ -318,7 +326,7 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.code == "KeyR" && e.ctrlKey) {
     e.preventDefault();
-    fetchFiles();
+    compileProgram();
   }
   if (e.code == "Space") {
     if (mouseHover) {

@@ -56,7 +56,9 @@
     height: 380px;
     resize: none;
     margin-top: 10px;
-
+    white-space: nowrap;
+    word-wrap: normal;
+    overflow: scroll;
   }
   #doNothing {
     position: absolute;
@@ -129,13 +131,13 @@
   <a href="https://kadincool.github.io">kadincool.github.io</a> -->
   <h1>Program:</h1>
   <p>Editing: <span class="display" ref="currentFile">file</span></p>
-  <button onclick="makeShaderProgram()">run</button>
+  <button onclick="compileProgram()">run</button>
   <button>save</button>
   <button onclick="fetchFiles()">load</button>
   <button>save as</button>
   <button>import</button>
   <button>export</button>
-  <textarea id="userCode" autocomplete="off"></textarea>
+  <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>
 </div>
 <button id="doNothing"></button>
 <script src="./gl.js"></script>

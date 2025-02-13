@@ -7,6 +7,7 @@ function update(param, value) {
 
 let displays = {};
 let config;
+const userCode = document.getElementById("userCode");
 
 document.addEventListener("DOMContentLoaded", (e) => {
   config = document.getElementById("config");
@@ -107,4 +108,16 @@ function loadOptions() {
   }
   // resetPos();
   // resetRot();
+}
+
+function quickLoadCode() {
+  let code = localStorage.getItem("autosave");
+  if (code == null) {
+    code = fshaderSplit[1];
+  }
+  userCode.value = code;
+}
+
+function quickSaveCode() {
+  localStorage.setItem("autosave", userCode.value);
 }
