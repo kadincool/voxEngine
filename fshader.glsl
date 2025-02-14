@@ -44,7 +44,7 @@ vec3 gsNoise(vec3 pos, vec3 baseColor, float weight) {
   return baseColor * (1.0 - weight) + vec3(spatialHash(vec4(pos, 5.0))) * weight;
 }
 
-vec4 getVoxel(vec3 pos) {
+vec4 getVoxel(vec3 pos) { // TODO: optimise bounding boxes
   // if (pos.x > 20.0) return vec4(gsNoise(pos, vec3(1.0), 0.1), length(pos.xy + vec2(sin(pos.z / 10.0) + 40.0, cos(pos.z / 10.0)) * 10.0) > 16.0);
   if (pos.x > 200.0) return vec4(gsNoise(pos, vec3(1.0), 0.1), length(pos.xy + vec2(-400.0, 0.0) + vec2(sin(pos.z / 50.0), cos(pos.z / 50.0)) * 50.0) > 64.0);
   if (pos.x >= 0.0 && abs(pos.y - sin(pos.z / 4.0) * 4.0) < 1.0) return vec4(sin(pos.z / 4.0 + time) / 2.0 + 0.5, 0.0, 0.0, 1.0); // sine graph

@@ -122,10 +122,30 @@ function quickSaveCode() {
   localStorage.setItem("autosave", userCode.value);
 }
 
-const sysFiles = ["autosave", "options", "programs", "editing", "default"];
+const sysFiles = ["autosave", "options", "programs", "editing", "default"]; //TODO: make all localStorage start with VXE
 
 function loadCode() {
-  
+  keys = {};
+  let loadedFileName = prompt("Enter name for program:");
+  if (loadedFileName == "default") {
+    if (!prompt("Are you sure you want to load? (unsaved progress will be lost)")) {
+      return;
+    }
+    userCode.value = fshaderSplit[1];
+  } else if (sysFiles.includes(loadedFileName)) {
+    alert("unavailable");
+    return;
+  } else {
+    let code = localStorage.getItem(loadedFileName);
+    if (!code) {
+      return;
+    }
+    if (!prompt("Are you sure you want to load? (unsaved progress will be lost)")) {
+      return;
+    }
+    userCode.value = code;
+  }
+  localStorage.setItem("editing", loadedFileName);
 }
 
 function saveCode() {
