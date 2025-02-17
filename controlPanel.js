@@ -57,6 +57,20 @@ function togglePause() {
   }
 }
 
+function setPaused(pause = true) {
+  let paused = document.getElementById("paused");
+  let button = document.getElementById("pauseButton")
+  running = !pause;
+  displays.paused.innerText = !running;
+  if (running) {
+    paused.style.display = "none";
+    button.innerText = "pause";
+  } else {
+    paused.style.display = "block";
+    button.innerText = "play";
+  }
+}
+
 function setSlidersToValues() {
   let resModifier = document.getElementById("resModifier");
   let renderDist = document.getElementById("renderDist");
@@ -82,8 +96,7 @@ function setSlidersToValues() {
 }
 
 function panic() {
-  running = true;
-  togglePause();
+  setPaused();
   let resSlider = document.getElementById("resModifier");
   let distSlider = document.getElementById("renderDist");
   resSlider.value = resSlider.min;

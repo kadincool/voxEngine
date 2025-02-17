@@ -83,7 +83,8 @@ function compileProgram() {
 
 function makeShaderProgram() {
   let wasRunning = running;
-  running = false;
+  setPaused();
+  
   if (vshader) gl.deleteShader(vshader);
   if (fshader) gl.deleteShader(fshader);
   if (program) gl.deleteProgram(program);
@@ -131,7 +132,8 @@ function makeShaderProgram() {
   gl.enableVertexAttribArray(posAttrib);
   gl.vertexAttribPointer(posAttrib, 2, gl.FLOAT, false, 0, 0);
   
-  running = wasRunning;
+  // running = wasRunning;
+  setPaused(!wasRunning);
 }
 
 // /./
