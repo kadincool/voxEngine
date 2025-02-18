@@ -71,7 +71,8 @@ async function fetchFiles() {
   quickLoadCode();
   // console.log(fshaderSplit);
   compileProgram();
-  running = true;
+  // running = true;
+  setPaused(false);
 }
 fetchFiles();
 

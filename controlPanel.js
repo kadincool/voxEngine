@@ -116,6 +116,7 @@ function loadOptions() {
       options = savedOptions;
       setSlidersToValues();
     }
+    // setPaused(false);
   } catch(err) {
     console.error(err);
   }
@@ -140,6 +141,9 @@ const sysFiles = ["autosave", "options", "programs", "editing", "default"]; //TO
 function loadCode() {
   keys = {};
   let loadedFileName = prompt("Enter name for program:");
+  if (!loadedFileName) {
+    return;
+  }
   if (loadedFileName == "default") {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
@@ -151,6 +155,7 @@ function loadCode() {
   } else {
     let code = localStorage.getItem(loadedFileName);
     if (!code) {
+      alert("not found");
       return;
     }
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
@@ -159,6 +164,7 @@ function loadCode() {
     userCode.value = code;
   }
   localStorage.setItem("editing", loadedFileName);
+  compileProgram();
 }
 
 function saveCode() {
@@ -189,6 +195,14 @@ function saveCodeAs() {
   }
   localStorage.setItem("editing", loadedFileName);
   programs.push(loadedFileName);
-  localStorage.setItem("programs", JSON.stringify(loadedFileName));
+  localStorage.setItem("programs", JSON.stringify(programs));
 
+}
+
+function importCode() {
+  
+}
+
+function exportCode() {
+  
 }

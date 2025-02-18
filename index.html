@@ -118,7 +118,7 @@
     <p>smoothed: <input class="setting" type="checkbox" autocomplete="off" id="smooth" onchange="update(this, this.checked)"></p>
     <p>isometric: <input class="setting" type="checkbox" autocomplete="off" id="isoCam" onchange="update(this, this.checked); resetRot()"></p>
     <p>move speed: <span class="display" ref="moveSpeed">4</span></p>
-    <input class="setting" type="range" min="0" max="8" value="2" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
+    <input class="setting" type="range" min="0" max="8" value="4" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
   </div>
   <hr>
   <!-- <h1>Shelved</h1>
@@ -132,11 +132,11 @@
   <h1>Program:</h1>
   <p>Editing: <span class="display" ref="currentFile">file</span></p>
   <button onclick="compileProgram()">run</button>
-  <button>save</button>
+  <button onclick="saveCode()">save</button>
   <button onclick="loadCode()">load</button>
-  <button>save as</button>
-  <button>import</button>
-  <button>export</button>
+  <button onclick="saveCodeAs()">save as</button>
+  <button onclick="importCode()">import</button>
+  <button onclick="exportCode()">export</button>
   <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>
 </div>
 <button id="doNothing"></button>
