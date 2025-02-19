@@ -335,6 +335,10 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     compileProgram();
   }
+  if (e.code == "KeyS" && e.ctrlKey) {
+    e.preventDefault();
+    saveCode();
+  }
   if (e.code == "Space") {
     if (mouseHover) {
       togglePannel();

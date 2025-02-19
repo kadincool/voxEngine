@@ -214,15 +214,18 @@ function saveCodeAs(name) {
   displays.currentFile.innerText = localStorage.getItem("editing");
   programs.push(loadedFileName);
   localStorage.setItem("programs", JSON.stringify(programs));
-
+  saveCode();
 }
 
 function importCode() {
+  keys = {};
   let fileLoader = document.createElement("input");
   fileLoader.type = "file";
   fileLoader.onchange = function(event) {
-    console.log(event);
     if (event.target.files.length > 0) {
+      if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
+        return;
+      }
       let file = event.target.files[0];
       let filename = file.name.split(".");
       let reader = new FileReader();
@@ -234,12 +237,15 @@ function importCode() {
         saveCode();
         compileProgram();
       }
+    } else {
+      alert("load failed");
     }
   }
   fileLoader.click();
 }
 
 function exportCode() {
+  keys = {};
   let filename = localStorage.getItem("editing") + ".glsl";
   let fileContent = userCode.value;
   let file = new Blob([fileContent], {type: "text/plain"});
