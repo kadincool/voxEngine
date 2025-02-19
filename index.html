@@ -66,6 +66,9 @@
     left: -100px;
     /* visibility: hidden; */
   }
+  #errorList {
+    color: red;
+  }
 </style>
 <canvas id="glCanvas"></canvas>
 <div id="paused" style="display: none;">
@@ -131,12 +134,13 @@
   <a href="https://kadincool.github.io">kadincool.github.io</a> -->
   <h1>Program:</h1>
   <p>Editing: <span class="display" ref="currentFile">file</span></p>
-  <button onclick="compileProgram()">run</button>
   <button onclick="saveCode()">save</button>
   <button onclick="loadCode()">load</button>
-  <button onclick="saveCodeAs()">save as</button>
+  <button onclick="saveCodeAs()">save as</button><br>
+  <button onclick="compileProgram()">run</button>
   <button onclick="importCode()">import</button>
   <button onclick="exportCode()">export</button>
+  <div id="errorList">test</div>
   <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>
 </div>
 <button id="doNothing"></button>

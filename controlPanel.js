@@ -124,7 +124,7 @@ function loadOptions() {
   // resetRot();
 }
 
-function quickLoadCode() {
+function quickLoadCode() { // init
   let code = localStorage.getItem("autosave");
   if (code == null) {
     code = fshaderSplit[1];
@@ -139,6 +139,7 @@ function quickSaveCode() {
 }
 
 const sysFiles = ["autosave", "options", "programs", "editing", "default", "list", "unnamed"]; //TODO: make all localStorage start with VXE
+let ownFiles = [];
 
 function loadCode() {
   keys = {};
@@ -176,7 +177,8 @@ function loadCode() {
 function saveCode() {
   quickSaveCode();
   let currentFile = localStorage.getItem("editing");
-  if (currentFile == "default") {
+  if (sysFiles.includes(currentFile)) {
+  // if (currentFile == "default") {
     saveCodeAs();
     return;
   }
@@ -187,9 +189,14 @@ function saveCode() {
   localStorage.setItem(currentFile, userCode.value);
 }
 
-function saveCodeAs() {
+function saveCodeAs(name) {
   keys = {};
-  let loadedFileName = prompt("Enter name for program:");
+  let loadedFileName
+  if (name) {
+    loadedFileName = name;
+  } else {
+    loadedFileName = prompt("Enter name for program:");
+  }
   let programs = JSON.parse(localStorage.getItem("programs"));
   if (programs == null) {
     programs = [];

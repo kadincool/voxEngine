@@ -67,7 +67,6 @@ async function fetchFiles() {
   // loadOptions();
   vshaderSrc = await fetch("./vshader.glsl").then((response) => response.text());
   fshaderSrc = await fetch("./fshader.glsl").then((response) => response.text());
-  console.log(fshaderSrc);
   fshaderSplit = fshaderSrc.split(/\/\/ snip\r?\n/);
   quickLoadCode();
   // console.log(fshaderSplit);
@@ -80,15 +79,18 @@ function compileProgram() {
   quickSaveCode();
   fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
   makeShaderProgram();
+  setPaused(false);
 }
 
 function makeShaderProgram() {
   let wasRunning = running;
+  let errorList = document.getElementById("errorList");
   setPaused();
   
   if (vshader) gl.deleteShader(vshader);
   if (fshader) gl.deleteShader(fshader);
   if (program) gl.deleteProgram(program);
+  errorList.innerHTML = "";
 
   // make shader program
   fshader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -108,6 +110,8 @@ function makeShaderProgram() {
     console.warn(gl.getShaderInfoLog(vshader));
     console.warn(gl.getShaderInfoLog(fshader));
     console.warn(gl.getProgramInfoLog(program));
+    
+    errorList.innerText = gl.getProgramInfoLog(program);
     throw new Error("program failed to compile");
   }
   
