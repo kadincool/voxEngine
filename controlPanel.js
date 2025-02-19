@@ -130,13 +130,15 @@ function quickLoadCode() {
     code = fshaderSplit[1];
   }
   userCode.value = code;
+  if (!localStorage.getItem("editing")) localStorage.setItem("editing", "unnamed")
+  displays.currentFile.innerText = localStorage.getItem("editing");
 }
 
 function quickSaveCode() {
   localStorage.setItem("autosave", userCode.value);
 }
 
-const sysFiles = ["autosave", "options", "programs", "editing", "default"]; //TODO: make all localStorage start with VXE
+const sysFiles = ["autosave", "options", "programs", "editing", "default", "list", "unnamed"]; //TODO: make all localStorage start with VXE
 
 function loadCode() {
   keys = {};
@@ -144,7 +146,10 @@ function loadCode() {
   if (!loadedFileName) {
     return;
   }
-  if (loadedFileName == "default") {
+  if (loadedFileName == "list") {
+    alert(localStorage.getItem("programs"));
+    return;
+  } else if (loadedFileName == "unnamed" || loadedFileName == "default") {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }
@@ -164,6 +169,7 @@ function loadCode() {
     userCode.value = code;
   }
   localStorage.setItem("editing", loadedFileName);
+  displays.currentFile.innerText = localStorage.getItem("editing");
   compileProgram();
 }
 
@@ -171,6 +177,10 @@ function saveCode() {
   quickSaveCode();
   let currentFile = localStorage.getItem("editing");
   if (currentFile == "default") {
+    saveCodeAs();
+    return;
+  }
+  if (sysFiles.includes(currentFile)) {
     saveCodeAs();
     return;
   }
@@ -194,15 +204,37 @@ function saveCodeAs() {
     return;
   }
   localStorage.setItem("editing", loadedFileName);
+  displays.currentFile.innerText = localStorage.getItem("editing");
   programs.push(loadedFileName);
   localStorage.setItem("programs", JSON.stringify(programs));
 
 }
 
 function importCode() {
-  
+  let fileLoader = document.createElement("input");
+  fileLoader.type = "file";
+  fileLoader.onchange = function(event) {
+    console.log(event);
+    if (event.target.files.length > 0) {
+      let file = event.target.files[0];
+      let filename = file.name.split(".");
+      let reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function(event) {
+        userCode.value = event.target.result;
+        localStorage.setItem("editing", filename[0]);
+        displays.currentFile.innerText = localStorage.getItem("editing");
+        saveCode();
+        compileProgram();
+      }
+    }
+  }
+  fileLoader.click();
 }
 
 function exportCode() {
-  
+  let filename = localStorage.getItem("editing") + ".glsl";
+  let fileContent = userCode.value;
+  let file = new Blob([fileContent], {type: "text/plain"});
+  saveBlob(file, filename);
 }

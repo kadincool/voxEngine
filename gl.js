@@ -169,7 +169,7 @@ function render(takeScreenshot = false) {
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   
   if (takeScreenshot) {
-    canvas.toBlob((blob) => saveFile(blob, "VOXENGINE" + Date.now()));
+    canvas.toBlob((blob) => saveBlob(blob, "VOXENGINE" + Date.now()));
   } 
   
   // requestAnimationFrame((end) => {console.log(Math.round(end - startTime))});
@@ -308,7 +308,7 @@ function takeScreenshot() {
   render(true);
 }
 
-async function saveFile(blob, name) {
+async function saveBlob(blob, name) {
   let link = document.createElement("a");
   let objectUrl = URL.createObjectURL(blob);
   link.href = objectUrl;
