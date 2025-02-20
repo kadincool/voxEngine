@@ -278,41 +278,65 @@ function commentLines() {
     endOfChunk++;
     // userCode.selectionStart = startOfChunk;
   }
-  // console.log(JSON.stringify(userCode.value.substring(startOfChunk, endOfChunk)));
-  // let lineBreaks = [];
-  // for (let i = startOfChunk; i < endOfChunk; i++) {
-  //   // console.log(JSON.stringify(userCode.value[i]));
-  //   if (userCode.value[i] == "\n") {
-  //     lineBreaks.push[i];
-  //   }
-  // }
-  // let removingComments = false; // TODO: make check
-  // let stringBuilder = userCode.value.substring(0, startOfChunk);
-  // let textIndex = startOfChunk;
-  // let addedLength = 0;
-  // stringBuilder += "//";
-  // // if (selectionStart >= textIndex + addedLength) selectionStart += 2; // tautology
-  // // if (selectionEnd >= textIndex + addedLength) selectionEnd += 2; // tautology
-  // addedLength += 2;
-
-  // for (let position of lineBreaks) {
-  //   stringBuilder += userCode.value.substring(textIndex, position);
-  //   textIndex = position;
-  //   stringBuilder += "//";
-  //   // if (selectionStart >= textIndex + addedLength) selectionStart += 2; // contradiction
-  //   // if (selectionEnd >= textIndex + addedLength) selectionEnd += 2; // tautology?
-  //   addedLength += 2;
-  // }
-
+  console.log(JSON.stringify(userCode.value.substring(startOfChunk, endOfChunk)));
+  let lineBreaks = [];
+  for (let i = startOfChunk; i < endOfChunk; i++) {
+    // console.log(JSON.stringify(userCode.value[i]));
+    // console.log(userCode.value[i], "\n", userCode.value[i] == "\n");
+    if (userCode.value[i - 1] == "\n") {
+      lineBreaks.push(i);
+    }
+  }
+  // console.log(lineBreaks);
+  let removingComments = true; // TODO: make check\
+  for (let position of lineBreaks) {
+    if (userCode.value.substring(position, position + 2) != "//") {
+      removingComments = false;
+      break;
+    }
+  }
+  let stringBuilder = userCode.value.substring(0, startOfChunk);
+  // let stringBuilder = "";
   // console.log(stringBuilder);
 
-  if (userCode.value.substring(startOfChunk, startOfChunk + 2) == "//") {
-    userCode.value = userCode.value.substring(0, startOfChunk) + userCode.value.substring(startOfChunk + 2, userCode.value.length);
-    userCode.selectionStart = selectionStart - 2;
-    userCode.selectionEnd = selectionEnd - 2;
+  let textIndex = startOfChunk;
+  // let textIndex = 0;
+  let addedLength = 0;
+
+  if (removingComments) {
+    for (let position of lineBreaks) {
+      stringBuilder += userCode.value.substring(textIndex, position);
+      textIndex = position + 2;
+      // stringBuilder += "//";
+      if (selectionStart >= textIndex + addedLength) selectionStart -= 2;
+      if (selectionEnd >= textIndex + addedLength) selectionEnd -= 2;
+      addedLength -= 2;
+    }
   } else {
-    userCode.value = userCode.value.substring(0, startOfChunk) + "//" + userCode.value.substring(startOfChunk, userCode.value.length);
-    userCode.selectionStart = selectionStart + 2;
-    userCode.selectionEnd = selectionEnd + 2;
+    for (let position of lineBreaks) {
+      stringBuilder += userCode.value.substring(textIndex, position);
+      textIndex = position;
+      stringBuilder += "//";
+      if (selectionStart >= textIndex + addedLength) selectionStart += 2;
+      if (selectionEnd >= textIndex + addedLength) selectionEnd += 2;
+      addedLength += 2;
+    }
   }
+
+  stringBuilder += userCode.value.substring(textIndex);
+
+  // console.log(stringBuilder);
+  userCode.value = stringBuilder;
+  userCode.selectionStart = selectionStart;
+  userCode.selectionEnd = selectionEnd;
+
+  // if (userCode.value.substring(startOfChunk, startOfChunk + 2) == "//") {
+  //   userCode.value = userCode.value.substring(0, startOfChunk) + userCode.value.substring(startOfChunk + 2, userCode.value.length);
+  //   userCode.selectionStart = selectionStart - 2;
+  //   userCode.selectionEnd = selectionEnd - 2;
+  // } else {
+  //   userCode.value = userCode.value.substring(0, startOfChunk) + "//" + userCode.value.substring(startOfChunk, userCode.value.length);
+  //   userCode.selectionStart = selectionStart + 2;
+  //   userCode.selectionEnd = selectionEnd + 2;
+  // }
 }
