@@ -339,6 +339,9 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     saveCode();
   }
+  if (e.code == "ControlRight") { // test bind
+    commentLine();
+  }
   if (e.code == "Space") {
     if (mouseHover) {
       togglePannel();

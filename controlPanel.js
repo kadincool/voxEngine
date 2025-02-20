@@ -251,3 +251,24 @@ function exportCode() {
   let file = new Blob([fileContent], {type: "text/plain"});
   saveBlob(file, filename);
 }
+
+// ideas
+// comment / uncomment
+// tab indent
+// auto indent
+// alt move lines
+// ctrl D duplicate
+function commentLine() {
+  let startOfLine = userCode.selectionStart;
+  while (startOfLine > 0 && userCode.value[startOfLine - 1] != "\n") {
+    startOfLine -= 1;
+    userCode.selectionStart = startOfLine;
+  }
+  // console.log(userCode.value.substring(startOfLine, startOfLine + 2));
+  if (userCode.value.substring(startOfLine, startOfLine + 2) == "//") {
+    console.log("comment exists");
+  } else {
+    // console.log(userCode.value.substring(0, startOfLine) + "//" + userCode.value.substring(startOfLine, userCode.value.length));
+  }
+  //console.log(userCode.value[startOfLine - 1]);
+}
