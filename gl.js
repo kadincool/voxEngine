@@ -32,8 +32,7 @@ let isometricUni;
 let posBuffer;
 let vertArray;
 
-let vshaderPre;
-let vshaderPost;
+let fshaderSplit;
 // program variables
 let camPos = {x: 0.0, y: 0.0, z: 0.0};
 let camRot = {x: 0.0, y: 0.0, z: 0.0};
@@ -49,6 +48,7 @@ let options = {
   fov: 90,
   isoCam: false
 };
+let textAreaFocused = false;
 let mouseHover = false;
 let mouseLocked = false;
 let running = false;
@@ -64,19 +64,33 @@ let autoMove = {
 // let takeScreenshot = false;
 
 async function fetchFiles() {
+  // loadOptions();
   vshaderSrc = await fetch("./vshader.glsl").then((response) => response.text());
   fshaderSrc = await fetch("./fshader.glsl").then((response) => response.text());
+  fshaderSplit = fshaderSrc.split(/\/\/ snip\r?\n/);
+  quickLoadCode();
+  // console.log(fshaderSplit);
+  compileProgram();
+  // running = true;
+  setPaused(false);
+} fetchFiles();
+
+function compileProgram() {
+  quickSaveCode();
+  fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
   makeShaderProgram();
-  running = true;
+  setPaused(false);
 }
-fetchFiles();
 
 function makeShaderProgram() {
   let wasRunning = running;
-  running = false;
+  let errorList = document.getElementById("errorList");
+  setPaused();
+  
   if (vshader) gl.deleteShader(vshader);
   if (fshader) gl.deleteShader(fshader);
   if (program) gl.deleteProgram(program);
+  errorList.innerHTML = "";
 
   // make shader program
   fshader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -96,6 +110,8 @@ function makeShaderProgram() {
     console.warn(gl.getShaderInfoLog(vshader));
     console.warn(gl.getShaderInfoLog(fshader));
     console.warn(gl.getProgramInfoLog(program));
+    
+    errorList.innerText = gl.getProgramInfoLog(program);
     throw new Error("program failed to compile");
   }
   
@@ -121,7 +137,8 @@ function makeShaderProgram() {
   gl.enableVertexAttribArray(posAttrib);
   gl.vertexAttribPointer(posAttrib, 2, gl.FLOAT, false, 0, 0);
   
-  running = wasRunning;
+  // running = wasRunning;
+  setPaused(!wasRunning);
 }
 
 // /./
@@ -156,7 +173,7 @@ function render(takeScreenshot = false) {
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   
   if (takeScreenshot) {
-    canvas.toBlob((blob) => saveFile(blob, "VOXENGINE" + Date.now()));
+    canvas.toBlob((blob) => saveBlob(blob, "VOXENGINE" + Date.now()));
   } 
   
   // requestAnimationFrame((end) => {console.log(Math.round(end - startTime))});
@@ -265,6 +282,7 @@ function resetRot() {
 }
 
 function setRot() {
+  keys = {};
   camRot.x = Number(prompt("Rotation X:") || camRot.x);
   camRot.y = Number(prompt("Rotation Y:") || camRot.y);
   camRot.z = Number(prompt("Rotation Z:") || camRot.z);
@@ -294,7 +312,7 @@ function takeScreenshot() {
   render(true);
 }
 
-async function saveFile(blob, name) {
+async function saveBlob(blob, name) {
   let link = document.createElement("a");
   let objectUrl = URL.createObjectURL(blob);
   link.href = objectUrl;
@@ -309,15 +327,24 @@ async function saveFile(blob, name) {
 
 document.addEventListener("keydown", (e) => {
   if (mouseHover) keys[e.code] = true;
-  if (e.code == "KeyO") {
+  if (e.code == "KeyO" && e.ctrlKey) {
+    e.preventDefault();
     panic();
+  }
+  if (e.code == "KeyR" && e.ctrlKey) {
+    e.preventDefault();
+    compileProgram();
+  }
+  if (e.code == "KeyS" && e.ctrlKey) {
+    e.preventDefault();
+    saveCode();
   }
   if (e.code == "Space") {
     if (mouseHover) {
       togglePannel();
     }
   }
-  if (e.code == "KeyP") {
+  if (e.code == "KeyP" && mouseHover) {
     togglePause();
   }
 });
@@ -329,6 +356,7 @@ canvas.addEventListener("mousedown", (e) => {
 canvas.addEventListener("mouseenter", (e) => {
   mouseHover = true;
   document.getElementById("doNothing").focus();
+  textAreaFocused = false;
   // canvas.focus();
 });
 canvas.addEventListener("mouseleave", (e) => {mouseHover = false; keys = {};});
@@ -342,4 +370,8 @@ document.addEventListener("mousemove", (e) => {
     camRot.y += e.movementX * options.mouseSen / 100;
     camRot.x += e.movementY * options.mouseSen / 100;
   }
+});
+userCode.addEventListener("focus", (e) => {
+  textAreaFocused = true;
+  keys = {};
 });

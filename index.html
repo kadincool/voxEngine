@@ -25,6 +25,7 @@
     padding: 10px;
     backdrop-filter: brightness(50%) blur(10px);
     overflow: scroll;
+    overflow-x: hidden;
     resize: both;
     box-sizing: border-box;
   }
@@ -56,7 +57,9 @@
     height: 380px;
     resize: none;
     margin-top: 10px;
-
+    white-space: nowrap;
+    /* word-wrap: normal; */
+    overflow: scroll;
   }
   #doNothing {
     position: absolute;
@@ -64,10 +67,11 @@
     left: -100px;
     /* visibility: hidden; */
   }
+  #errorList {
+    color: red;
+  }
 </style>
 <canvas id="glCanvas"></canvas>
-<script src="./gl.js"></script>
-<script src="./controlPanel.js"></script>
 <div id="paused" style="display: none;">
   <h1>Paused</h1>
 </div>
@@ -78,7 +82,7 @@
   <p>Shift to speed up</p>
   <p>Arrows to look</p>
   <p>Click to look with mouse</p>
-  <p>P to pause, O to panic!</p>
+  <p>P to pause, Ctrl + O to panic!</p>
   <p>Space to toggle this menu</p>
   <hr>
   <h1>Runtime:</h1>
@@ -118,25 +122,28 @@
     <p>smoothed: <input class="setting" type="checkbox" autocomplete="off" id="smooth" onchange="update(this, this.checked)"></p>
     <p>isometric: <input class="setting" type="checkbox" autocomplete="off" id="isoCam" onchange="update(this, this.checked); resetRot()"></p>
     <p>move speed: <span class="display" ref="moveSpeed">4</span></p>
-    <input class="setting" type="range" min="0" max="8" value="2" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
+    <input class="setting" type="range" min="0" max="8" value="4" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
   </div>
   <hr>
-  <h1>Shelved</h1>
+  <!-- <h1>Shelved</h1>
   <p>I made this project in about a weekend, which is the most work ive done in such a short period of time!</p>
   <p>While giving me a much needed boost in confidence, it also means ive gotten burnt out of the project.</p>
   <p>This project was really fun to work on, far exceeding my expectations of what I was trying to make, however I am a full time college student so I need to study.</p>
   <p>For now, I made this world to be explored, I recommend keeping the world res at 1 without smoothing to see this the way I meant for it to be seen.</p>
   <p>I may return to this project in the near future to add some things, notably a code editor to change the way the world is calculated.</p>
   <p>Hope you enjoy -Kadin</p>
-  <a href="https://kadincool.github.io">kadincool.github.io</a>
-  <!-- <h1>Program:</h1>
+  <a href="https://kadincool.github.io">kadincool.github.io</a> -->
+  <h1>Program:</h1>
   <p>Editing: <span class="display" ref="currentFile">file</span></p>
-  <button onclick="makeShaderProgram()">run</button>
-  <button>save</button>
-  <button onclick="fetchFiles()">load</button>
-  <button>save as</button>
-  <button>import</button>
-  <button>export</button>
-  <textarea id="userCode" autocomplete="off"></textarea> -->
+  <button onclick="saveCode()">save</button>
+  <button onclick="loadCode()">load</button>
+  <button onclick="saveCodeAs()">save as</button><br>
+  <button onclick="compileProgram()">run</button>
+  <button onclick="importCode()">import</button>
+  <button onclick="exportCode()">export</button>
+  <div id="errorList">test</div>
+  <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>
 </div>
 <button id="doNothing"></button>
+<script src="./gl.js"></script>
+<script src="./controlPanel.js"></script>
