@@ -288,7 +288,7 @@ function commentLines() {
     }
   }
   // console.log(lineBreaks);
-  let removingComments = true; // TODO: make check\
+  let removingComments = true;
   for (let position of lineBreaks) {
     if (userCode.value.substring(position, position + 2) != "//") {
       removingComments = false;

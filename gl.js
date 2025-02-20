@@ -342,6 +342,7 @@ document.addEventListener("keydown", (e) => {
   // code editor functions
   if (userCode == document.activeElement) {
     if (e.code == "Slash" && e.ctrlKey) {
+      e.preventDefault();
       commentLines();
     }
   } else if (mouseHover) {
