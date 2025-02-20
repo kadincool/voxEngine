@@ -339,17 +339,22 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     saveCode();
   }
-  if (e.code == "ControlRight") { // test bind
-    commentLine();
-  }
-  if (e.code == "Space") {
-    if (mouseHover) {
+  // code editor functions
+  if (userCode == document.activeElement) {
+    if (e.code == "Slash" && e.ctrlKey) {
+      commentLines();
+    }
+  } else if (mouseHover) {
+    if (e.code == "Space") {
       togglePannel();
     }
+    if (e.code == "KeyP") {
+      togglePause();
+    }
   }
-  if (e.code == "KeyP" && mouseHover) {
-    togglePause();
-  }
+  // if (e.code == "ControlRight") { // test bind
+  //   commentLine();
+  // }
 });
 document.addEventListener("keyup", (e) => {if (mouseHover) keys[e.code] = false;});
 
