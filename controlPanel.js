@@ -273,44 +273,46 @@ function commentLines() {
     startOfChunk--;
     // userCode.selectionStart = startOfChunk;
   }
-  console.log(endOfChunk, userCode.value.length, userCode.value[endOfChunk - 1]);
+  // console.log(endOfChunk, userCode.value.length, userCode.value[endOfChunk - 1]);
   while (endOfChunk < userCode.value.length && userCode.value[endOfChunk - 1] != "\n") {
     endOfChunk++;
     // userCode.selectionStart = startOfChunk;
   }
   // console.log(JSON.stringify(userCode.value.substring(startOfChunk, endOfChunk)));
-  let lineBreaks = [];
-  for (let i = startOfChunk; i < endOfChunk; i++) {
-    // console.log(JSON.stringify(userCode.value[i]));
-    if (userCode.value[i] == "\n") {
-      lineBreaks.push[i];
-    }
-  }
-  let removingComments = false; // TODO: make check
-  let stringBuilder = userCode.value.substring(0, startOfChunk);
-  let textIndex = startOfChunk;
-  let addedLength = 0;
-  stringBuilder += "//";
-  if (selectionStart >= textIndex + addedLength) selectionStart += 2; // tautology
-  if (selectionEnd >= textIndex + addedLength) selectionEnd += 2; // tautology
-  addedLength += 2;
-
-  for (let position of lineBreaks) {
-    stringBuilder += userCode.value.substring(textIndex, position);
-    textIndex = position;
-    stringBuilder += "//";
-    if (selectionStart >= textIndex + addedLength) selectionStart += 2; // contradiction
-    if (selectionEnd >= textIndex + addedLength) selectionEnd += 2; // tautology?
-    addedLength += 2;
-  }
-
-  // if (userCode.value.substring(startOfLine, startOfLine + 2) == "//") {
-  //   userCode.value = userCode.value.substring(0, startOfLine) + userCode.value.substring(startOfLine + 2, userCode.value.length);
-  //   userCode.selectionStart = selectionStart - 2;
-  //   userCode.selectionEnd = selectionEnd - 2;
-  // } else {
-  //   userCode.value = userCode.value.substring(0, startOfLine) + "//" + userCode.value.substring(startOfLine, userCode.value.length);
-  //   userCode.selectionStart = selectionStart + 2;
-  //   userCode.selectionEnd = selectionEnd + 2;
+  // let lineBreaks = [];
+  // for (let i = startOfChunk; i < endOfChunk; i++) {
+  //   // console.log(JSON.stringify(userCode.value[i]));
+  //   if (userCode.value[i] == "\n") {
+  //     lineBreaks.push[i];
+  //   }
   // }
+  // let removingComments = false; // TODO: make check
+  // let stringBuilder = userCode.value.substring(0, startOfChunk);
+  // let textIndex = startOfChunk;
+  // let addedLength = 0;
+  // stringBuilder += "//";
+  // // if (selectionStart >= textIndex + addedLength) selectionStart += 2; // tautology
+  // // if (selectionEnd >= textIndex + addedLength) selectionEnd += 2; // tautology
+  // addedLength += 2;
+
+  // for (let position of lineBreaks) {
+  //   stringBuilder += userCode.value.substring(textIndex, position);
+  //   textIndex = position;
+  //   stringBuilder += "//";
+  //   // if (selectionStart >= textIndex + addedLength) selectionStart += 2; // contradiction
+  //   // if (selectionEnd >= textIndex + addedLength) selectionEnd += 2; // tautology?
+  //   addedLength += 2;
+  // }
+
+  // console.log(stringBuilder);
+
+  if (userCode.value.substring(startOfChunk, startOfChunk + 2) == "//") {
+    userCode.value = userCode.value.substring(0, startOfChunk) + userCode.value.substring(startOfChunk + 2, userCode.value.length);
+    userCode.selectionStart = selectionStart - 2;
+    userCode.selectionEnd = selectionEnd - 2;
+  } else {
+    userCode.value = userCode.value.substring(0, startOfChunk) + "//" + userCode.value.substring(startOfChunk, userCode.value.length);
+    userCode.selectionStart = selectionStart + 2;
+    userCode.selectionEnd = selectionEnd + 2;
+  }
 }
