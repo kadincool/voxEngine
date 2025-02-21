@@ -345,6 +345,10 @@ document.addEventListener("keydown", (e) => {
       e.preventDefault();
       commentLines();
     }
+    if (e.code == "Enter") {
+      e.preventDefault();
+      newLine();
+    }
   } else if (mouseHover) {
     if (e.code == "Space") {
       togglePannel();
