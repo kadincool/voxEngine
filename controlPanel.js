@@ -106,12 +106,12 @@ function panic() {
 }
 
 function saveOptions() {
-  localStorage.setItem("options", JSON.stringify(options));
+  localStorage.setItem("VXEoptions", JSON.stringify(options));
 }
 
 function loadOptions() {
   try {
-    let savedOptions = JSON.parse(localStorage.getItem("options"))
+    let savedOptions = JSON.parse(localStorage.getItem("VXEoptions"))
     if (savedOptions) {
       options = savedOptions;
       setSlidersToValues();
@@ -125,20 +125,21 @@ function loadOptions() {
 }
 
 function quickLoadCode() { // init
-  let code = localStorage.getItem("autosave");
+  let code = localStorage.getItem("VXEautosave");
   if (code == null) {
     code = fshaderSplit[1];
   }
   userCode.value = code;
-  if (!localStorage.getItem("editing")) localStorage.setItem("editing", "unnamed")
-  displays.currentFile.innerText = localStorage.getItem("editing");
+  if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "unnamed")
+  displays.currentFile.innerText = localStorage.getItem("VXEediting");
 }
 
 function quickSaveCode() {
-  localStorage.setItem("autosave", userCode.value);
+  localStorage.setItem("VXEautosave", userCode.value);
 }
 
-const sysFiles = ["autosave", "options", "programs", "editing", "default", "list", "unnamed"]; //TODO: make all localStorage start with VXE
+const sysFiles = ["autosave", "options", "programs", "editing", "default", "list", "unnamed"]; //TODO remove sysfiles check because not able to interfere anymore
+// TODO make example files to load from
 let ownFiles = [];
 
 function loadCode() {
@@ -148,7 +149,7 @@ function loadCode() {
     return;
   }
   if (loadedFileName == "list") {
-    alert(localStorage.getItem("programs"));
+    alert(localStorage.getItem("VXEprograms"));
     return;
   } else if (loadedFileName == "unnamed" || loadedFileName == "default") {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
@@ -159,7 +160,7 @@ function loadCode() {
     alert("unavailable");
     return;
   } else {
-    let code = localStorage.getItem(loadedFileName);
+    let code = localStorage.getItem("VXEP" + loadedFileName);
     if (!code) {
       alert("not found");
       return;
@@ -169,14 +170,14 @@ function loadCode() {
     }
     userCode.value = code;
   }
-  localStorage.setItem("editing", loadedFileName);
-  displays.currentFile.innerText = localStorage.getItem("editing");
+  localStorage.setItem("VXEediting", loadedFileName);
+  displays.currentFile.innerText = localStorage.getItem("VXEediting");
   compileProgram();
 }
 
 function saveCode() {
   quickSaveCode();
-  let currentFile = localStorage.getItem("editing");
+  let currentFile = localStorage.getItem("VXEediting");
   if (sysFiles.includes(currentFile)) {
   // if (currentFile == "default") {
     saveCodeAs();
@@ -186,7 +187,7 @@ function saveCode() {
     saveCodeAs();
     return;
   }
-  localStorage.setItem(currentFile, userCode.value);
+  localStorage.setItem("VXEP" + currentFile, userCode.value);
 }
 
 function saveCodeAs(name) {
@@ -197,9 +198,10 @@ function saveCodeAs(name) {
   } else {
     loadedFileName = prompt("Enter name for program:");
   }
-  let programs = JSON.parse(localStorage.getItem("programs"));
+  let programs = JSON.parse(localStorage.getItem("VXEprograms"));
   if (programs == null) {
     programs = [];
+    // TODO check for existing programs
   }
   if (!loadedFileName || sysFiles.includes(loadedFileName)) {
     alert("name unavailable");
@@ -210,10 +212,10 @@ function saveCodeAs(name) {
   } else if (!confirm("Confirm saving " + loadedFileName)) {
     return;
   }
-  localStorage.setItem("editing", loadedFileName);
-  displays.currentFile.innerText = localStorage.getItem("editing");
+  localStorage.setItem("VXEediting", loadedFileName);
+  displays.currentFile.innerText = localStorage.getItem("VXEediting");
   programs.push(loadedFileName);
-  localStorage.setItem("programs", JSON.stringify(programs));
+  localStorage.setItem("VXEprograms", JSON.stringify(programs));
   saveCode();
 }
 
@@ -232,8 +234,8 @@ function importCode() {
       reader.readAsText(file);
       reader.onload = function(event) {
         userCode.value = event.target.result;
-        localStorage.setItem("editing", filename[0]);
-        displays.currentFile.innerText = localStorage.getItem("editing");
+        localStorage.setItem("VXEediting", filename[0]);
+        displays.currentFile.innerText = localStorage.getItem("VXEediting");
         saveCode();
         compileProgram();
       }
@@ -246,7 +248,7 @@ function importCode() {
 
 function exportCode() {
   keys = {};
-  let filename = localStorage.getItem("editing") + ".glsl";
+  let filename = localStorage.getItem("VXEediting") + ".glsl";
   let fileContent = userCode.value;
   let file = new Blob([fileContent], {type: "text/plain"});
   saveBlob(file, filename);
