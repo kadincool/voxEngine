@@ -138,7 +138,7 @@ function quickSaveCode() {
   localStorage.setItem("VXEautosave", userCode.value);
 }
 
-const sysFiles = ["autosave", "options", "programs", "editing", "default", "list", "unnamed"]; //TODO change sysfiles check to be not as strict
+const sysFiles = ["default", "list", "rlist"]; 
 // TODO make example files to load from
 let ownFiles = [];
 
@@ -157,13 +157,15 @@ function loadCode() {
           programs.push(key.slice(4));
         }
       }
+      //TODO add default and example files to list
+      //TODO merge both instances of code that does this into a function
       programs.sort();
       localStorage.setItem("VXEprograms", JSON.stringify(programs));
     }
     alert(localStorage.getItem("VXEprograms"));
     // alert(programs);
     return;
-  } else if (loadedFileName == "unnamed" || loadedFileName == "default") {
+  } else if (loadedFileName == "default") {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }

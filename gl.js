@@ -150,6 +150,13 @@ function clamp(x, min, max) {
 
 function render(takeScreenshot = false) {
   // let startTime = performance.now();
+  if (takeScreenshot) {
+    if (canvas.width != 1920 * options.resModifier) canvas.width = 1920 * options.resModifier;
+    if (canvas.height != 1080 * options.resModifier) canvas.height = 1080 * options.resModifier;
+  } else {
+    if (canvas.width != window.innerwidth * options.resModifier) canvas.width = window.innerWidth * options.resModifier;
+    if (canvas.height != window.innerHeight * options.resModifier) canvas.height = window.innerHeight * options.resModifier;
+  }
   gl.viewport(0, 0, canvas.width, canvas.height);
   
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -177,6 +184,12 @@ function render(takeScreenshot = false) {
   } 
   
   // requestAnimationFrame((end) => {console.log(Math.round(end - startTime))});
+}
+
+function takeScreenshot() {
+  if (canvas.width != 1920 * options.resModifier) canvas.width = 1920 * options.resModifier;
+  if (canvas.height != 1080 * options.resModifier) canvas.height = 1080 * options.resModifier;
+  render(true);
 }
 
 function frame() {
@@ -304,12 +317,6 @@ function gridSnap() {
   displays.rotX.innerText = Math.floor(camRot.x * 1000) / 1000;
   displays.rotY.innerText = Math.floor(camRot.y * 1000) / 1000;
   displays.rotZ.innerText = Math.floor(camRot.z * 1000) / 1000;
-}
-
-function takeScreenshot() {
-  if (canvas.width != 1920 * options.resModifier) canvas.width = 1920 * options.resModifier;
-  if (canvas.height != 1080 * options.resModifier) canvas.height = 1080 * options.resModifier;
-  render(true);
 }
 
 async function saveBlob(blob, name) {
