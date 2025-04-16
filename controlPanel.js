@@ -138,7 +138,7 @@ function quickSaveCode() {
   localStorage.setItem("VXEautosave", userCode.value);
 }
 
-const sysFiles = ["autosave", "options", "programs", "editing", "default", "list", "unnamed"]; //TODO remove sysfiles check because not able to interfere anymore
+const sysFiles = ["autosave", "options", "programs", "editing", "default", "list", "unnamed"]; //TODO change sysfiles check to be not as strict
 // TODO make example files to load from
 let ownFiles = [];
 
@@ -148,8 +148,20 @@ function loadCode() {
   if (!loadedFileName) {
     return;
   }
-  if (loadedFileName == "list") {
+  if (loadedFileName == "list" || loadedFileName == "rlist") {
+    let programs = JSON.parse(localStorage.getItem("VXEprograms"));
+    if (programs == null || loadedFileName == "rlist") {
+      programs = [];
+      for (let key of Object.keys(localStorage)) {
+        if (key.slice(0, 4) == "VXEP") {
+          programs.push(key.slice(4));
+        }
+      }
+      programs.sort();
+      localStorage.setItem("VXEprograms", JSON.stringify(programs));
+    }
     alert(localStorage.getItem("VXEprograms"));
+    // alert(programs);
     return;
   } else if (loadedFileName == "unnamed" || loadedFileName == "default") {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
@@ -201,7 +213,11 @@ function saveCodeAs(name) {
   let programs = JSON.parse(localStorage.getItem("VXEprograms"));
   if (programs == null) {
     programs = [];
-    // TODO check for existing programs
+    for (let key of Object.keys(localStorage)) {
+      if (key.slice(0, 4) == "VXEP") {
+        programs.push(key.slice(4));
+      }
+    }
   }
   if (!loadedFileName || sysFiles.includes(loadedFileName)) {
     alert("name unavailable");
@@ -214,7 +230,8 @@ function saveCodeAs(name) {
   }
   localStorage.setItem("VXEediting", loadedFileName);
   displays.currentFile.innerText = localStorage.getItem("VXEediting");
-  programs.push(loadedFileName);
+  if (!programs.includes(loadedFileName)) programs.push(loadedFileName); // only add if not yet in
+  programs.sort();
   localStorage.setItem("VXEprograms", JSON.stringify(programs));
   saveCode();
 }

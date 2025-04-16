@@ -127,6 +127,7 @@ vec4 raycast(vec3 pos, vec3 dir) {
       pos.z = round(pos.z);
     }
     traveled += distToTravel;
+    // TODO increase voxel size as travels
     
     if (traveled >= float(renderDist)) {
       return getSkybox(dir);
@@ -150,6 +151,7 @@ vec4 raycast(vec3 pos, vec3 dir) {
   }
   return vec4(vec3(0.0), 1.0);
 }
+// TODO add raycast for lighting
 
 void main() {
   vec2 uv = (gl_FragCoord.xy * 2.0 - sres) / sres.y;
