@@ -146,6 +146,7 @@ vec4 raycast(vec3 pos, vec3 dir) {
     vec4 voxel = getVoxel(checkPos / worldRes);
     if (voxel.w == 1.0) {
       return vec4(vec3(1.0 - traveled / float(renderDist)) * voxel.xyz + getSkybox(dir).xyz * traveled / float(renderDist), 1.0);
+// TODO allow for partially transparent voxels that partially obscure view
       // return vec4(vec3(1.0 - tanh(traveled / float(renderDist) * 4.0)), 1.0);
     }
   }
