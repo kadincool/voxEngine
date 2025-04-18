@@ -79,6 +79,7 @@ function compileProgram() {
   quickSaveCode();
   fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
   makeShaderProgram();
+  // TODO make last functional build that will compile and can be restored by loading restore
   setPaused(false);
 }
 
