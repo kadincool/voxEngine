@@ -130,7 +130,8 @@ function quickLoadCode() { // init
     code = fshaderSplit[1];
   }
   userCode.value = code;
-  if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "unnamed")
+  if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "unnamed");
+  // TODO make default instead of unnamed
   displays.currentFile.innerText = localStorage.getItem("VXEediting");
 }
 
