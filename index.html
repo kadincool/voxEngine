@@ -1,82 +1,11 @@
 <!DOCTYPE html>
-<style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    background-color: black;
-    color: white;
-  }
-  canvas {
-    width: 100vw;
-    height: 100vh;
-    image-rendering: pixelated;
-  }
-  #config {
-    background-color: rgba(0, 191, 255, 0.3);
-    border-radius: 10px;
-    position: absolute;
-    top: 25px;
-    left: 25px;
-    min-width: 300px;
-    width: 300px;
-    max-width: calc(100vw - 50px);
-    min-height: 400px;
-    height: calc(100vh - 50px);
-    max-height: calc(100vh - 50px);
-    padding: 10px;
-    backdrop-filter: brightness(50%) blur(10px);
-    overflow: scroll;
-    overflow-x: hidden;
-    resize: both;
-    box-sizing: border-box;
-  }
-  #paused {
-    position: absolute;
-    /* top: 50vh;
-    left: 50vw; */
-    top: 50vh;
-    left: 50vw;
-    background-color: rgba(0, 0, 0, 0.1);
-    padding: 12pt;
-    transform: translate(-50%, -50%);
-    border-radius: 12pt;
-    backdrop-filter: brightness(50%) blur(10px);
-  }
-  #paused h1 {
-    font-size: 42pt;
-  }
-  p, h1 {
-    margin: 0;
-  }
-  #userCode {
-    box-sizing: border-box;
-    /* min-width: 280px;
-    max-width: calc(100%); */
-    /* min-height: 50vh; */
-    width: 100%;
-    /* height: 50vh; */
-    height: 380px;
-    resize: none;
-    margin-top: 10px;
-    white-space: nowrap;
-    /* word-wrap: normal; */
-    overflow: scroll;
-  }
-  #doNothing {
-    position: absolute;
-    top: -100px;
-    left: -100px;
-    /* visibility: hidden; */
-  }
-  #errorList {
-    color: red;
-  }
-</style>
+<link href="./style.css" rel="stylesheet">
 <canvas id="glCanvas"></canvas>
 <div id="paused" style="display: none;">
   <h1>Paused</h1>
 </div>
 <div id="config">
+  <p id="warning">WARNING: using this program for extended periods time seems to cause the GPU to misbahave. Use with caution.</p>
   <h1>Controls:</h1>
   <p>W/A/S/D to move</p>
   <p>E to elevate, Q to drop</p>
@@ -143,7 +72,7 @@
   <button onclick="compileProgram()">run</button>
   <button onclick="importCode()">import</button>
   <button onclick="exportCode()">export</button>
-  <div id="errorList">test</div>
+  <div id="errorList"></div>
   <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>
 </div>
 <button id="doNothing"></button>

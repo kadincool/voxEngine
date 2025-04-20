@@ -17,5 +17,5 @@ vec4 getSkybox(vec3 dir) {
 }
 
 vec4 getVoxel(vec3 pos) {
-  return vec4(sat(voxCol(pos), 0.2), pos.y <= (sin(pos.x / 10.0) + sin(pos.z / 10.0)) * 10.0);
+  return vec4(sat(voxCol(pos), 0.4), pos.y <= (sin(pos.x / 10.0) + sin(pos.z / 10.0)) * 10.0);
 }
