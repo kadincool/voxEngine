@@ -150,31 +150,6 @@ vec4 color(vec2 uv, vec3 camPos) {
 
 void main() {
   vec2 uv = (gl_FragCoord.xy * 2.0 - sres) / sres.y;
-  // vec2 uv = (gl_FragCoord.xy * 2.0) / sres - 1.0;
-
-  // perspective camera
-  // vec3 pos = camPos;
-  // vec3 dir = normalize(vec3(uv * fovMult, 1.0));
-  // dir = normalize((camRot * vec4(dir, 1.0)).xyz);
-  /*
-  vec3 pos;
-  vec3 dir;
-  if (isometric) {
-    // isometric camera
-    pos = vec3(uv, 0.0) * fovMult * 100.0;
-    pos = (camRot * vec4(pos, 0.0)).xyz;
-    pos += camPos;
-    dir = vec3(0.0, 0.0, 1.0);
-    dir = normalize((camRot * vec4(dir, 1.0)).xyz);
-  } else {
-    // perspective camera
-    pos = camPos;
-    dir = normalize(vec3(uv * fovMult, 1.0));
-    dir = normalize((camRot * vec4(dir, 1.0)).xyz);
-  }
-
-  fcolor = raycast(pos * worldRes, dir);
-  */
   if (sbs3d) {
     vec3 pos;
     if (uv.x > 0.0) {
