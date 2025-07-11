@@ -5,7 +5,7 @@
   <h1>Paused</h1>
 </div>
 <div id="config">
-  <p id="warning">WARNING: using this program for extended periods time seems to cause the GPU to misbahave. Use with caution.</p>
+  <!-- <p id="warning">WARNING: using this program for extended periods time seems to cause the GPU to misbahave. Use with caution.</p> -->
   <h1>Controls:</h1>
   <p>W/A/S/D to move</p>
   <p>E to elevate, Q to drop</p>
@@ -54,6 +54,11 @@
     <p>isometric: <input class="setting" type="checkbox" autocomplete="off" id="isoCam" onchange="update(this, this.checked); resetRot()"></p>
     <p>move speed: <span class="display" ref="moveSpeed">4</span></p>
     <input class="setting" type="range" min="0" max="8" value="4" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
+    <p>side by side 3d: <input class="setting" type="checkbox" autocomplete="off" id="sbs3d" onchange="update(this, this.checked)"></p>
+    <p>anaglyph 3d: <input class="setting" type="checkbox" autocomplete="off" id="anaglyph3d" onchange="update(this, this.checked);"></p>
+    <p>flip eyes: <input class="setting" type="checkbox" autocomplete="off" id="flipEyes" onchange="update(this, this.checked);"></p>
+    <p>eye distance: <span class="display" ref="eyeDist">0.5</span></p>
+    <input class="setting" type="range" min="0" max="4" value="0.5" step="0.1" autocomplete="off" id="eyeDist" oninput="update(this, this.value)">
   </div>
   <hr>
   <!-- <h1>Shelved</h1>

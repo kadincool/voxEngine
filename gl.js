@@ -29,6 +29,11 @@ let worldResUni;
 let fovMultUni;
 let smoothedUni;
 let isometricUni;
+let sbs3dUni;
+let anaglyph3dUni;
+let eyeDistUni;
+let flipEyesUni;
+
 let posBuffer;
 let vertArray;
 
@@ -46,7 +51,11 @@ let options = {
   mouseSen: 15,
   smooth: false,
   fov: 90,
-  isoCam: false
+  isoCam: false,
+  sbs3d: false,
+  anaglyph3d: false,
+  eyeDist: 0.5,
+  flipEyes: false
 };
 let textAreaFocused = false;
 let mouseHover = false;
@@ -65,8 +74,8 @@ let autoMove = {
 
 async function fetchFiles() {
   // loadOptions();
-  vshaderSrc = await fetch("./vshader.glsl").then((response) => response.text());
-  fshaderSrc = await fetch("./fshader.glsl").then((response) => response.text());
+  vshaderSrc = await fetch("./vshader.glsl", {cache: "no-store"}).then((response) => response.text());
+  fshaderSrc = await fetch("./fshader.glsl", {cache: "no-store"}).then((response) => response.text());
   fshaderSplit = fshaderSrc.split(/\/\/ snip\r?\n/);
   quickLoadCode();
   // console.log(fshaderSplit);
@@ -127,6 +136,10 @@ function makeShaderProgram() {
   worldResUni = gl.getUniformLocation(program, "worldRes");
   smoothedUni = gl.getUniformLocation(program, "smoothed");
   isometricUni = gl.getUniformLocation(program, "isometric");
+  sbs3dUni = gl.getUniformLocation(program, "sbs3d");
+  anaglyph3dUni = gl.getUniformLocation(program, "anaglyph3d");
+  eyeDistUni = gl.getUniformLocation(program, "eyeDist");
+  flipEyesUni = gl.getUniformLocation(program, "flipEyes");
   
   //buffer vertices
   posBuffer = gl.createBuffer();
@@ -176,6 +189,10 @@ function render(takeScreenshot = false) {
   gl.uniform1f(fovMultUni, Math.tan(options.fov / 360 * Math.PI));
   gl.uniform1i(smoothedUni, options.smooth);
   gl.uniform1i(isometricUni, options.isoCam);
+  gl.uniform1i(sbs3dUni, options.sbs3d);
+  gl.uniform1i(anaglyph3dUni, options.anaglyph3d);
+  gl.uniform1f(eyeDistUni, options.eyeDist);
+  gl.uniform1i(flipEyesUni, options.flipEyes);
 
   gl.bindVertexArray(vertArray);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
