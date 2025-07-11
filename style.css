@@ -1,0 +1,95 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: black;
+  color: white;
+}
+canvas {
+  width: 100vw;
+  height: 100vh;
+  image-rendering: pixelated;
+}
+#doNothing {
+  position: absolute;
+  top: -100px;
+  left: -100px;
+  /* visibility: hidden; */
+}
+/* config stuff */
+#config {
+  background-color: rgba(0, 191, 255, 0.3);
+  border-radius: 10px;
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  min-width: 300px;
+  width: 300px;
+  max-width: calc(100vw - 50px);
+  min-height: 400px;
+  height: calc(100vh - 50px);
+  max-height: calc(100vh - 50px);
+  padding: 10px;
+  backdrop-filter: brightness(50%) blur(10px);
+  overflow: scroll;
+  overflow-x: hidden;
+  resize: both;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+}
+#paused {
+  position: absolute;
+  /* top: 50vh;
+  left: 50vw; */
+  top: 50vh;
+  left: 50vw;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 12pt;
+  transform: translate(-50%, -50%);
+  border-radius: 12pt;
+  backdrop-filter: brightness(50%) blur(10px);
+}
+#paused h1 {
+  font-size: 42pt;
+}
+p, h1 {
+  margin: 0;
+}
+#userCode {
+  box-sizing: border-box;
+  /* min-width: 280px;
+  max-width: calc(100%); */
+  /* min-height: 50vh; */
+  width: 100%;
+  /* height: 50vh; */
+  height: 380px;
+  resize: none;
+  margin-top: 10px;
+  white-space: nowrap;
+  /* word-wrap: normal; */
+  overflow: scroll;
+  color: white;
+  scrollbar-width: thin;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 0;
+  border-radius: 5px;
+}
+#errorList {
+  color: red;
+}
+#warning {
+  color: orange;
+}
+/* buttons */
+#config button {
+  background-color: rgb(0, 95, 127);
+  border: 2px;
+  border-radius: 10px;
+  border-color: rgb(0, 191, 255);
+  border-style: solid;
+  margin-bottom: 2px;
+  color: white;
+}
+#config button:hover {
+  background-color: rgb(0, 143, 191);
+}
