@@ -18,6 +18,11 @@ uniform float fovMult;
 uniform bool smoothed;
 uniform bool isometric;
 
+uniform bool sbs3d;
+uniform bool anaglyph3d;
+uniform float eyeDist;
+uniform bool flipEyes;
+
 // user code
 // snip
 // tool functions
@@ -123,14 +128,7 @@ vec4 raycast(vec3 pos, vec3 dir) {
 }
 // TODO add raycast for lighting
 
-void main() {
-  vec2 uv = (gl_FragCoord.xy * 2.0 - sres) / sres.y;
-  // vec2 uv = (gl_FragCoord.xy * 2.0) / sres - 1.0;
-
-  // perspective camera
-  // vec3 pos = camPos;
-  // vec3 dir = normalize(vec3(uv * fovMult, 1.0));
-  // dir = normalize((camRot * vec4(dir, 1.0)).xyz);
+vec4 color(vec2 uv, vec3 camPos) {
   vec3 pos;
   vec3 dir;
   if (isometric) {
@@ -147,5 +145,29 @@ void main() {
     dir = normalize((camRot * vec4(dir, 1.0)).xyz);
   }
 
-  fcolor = raycast(pos * worldRes, dir);
+  return raycast(pos * worldRes, dir);
+}
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy * 2.0 - sres) / sres.y;
+  if (sbs3d) {
+    vec3 pos;
+    if (uv.x > 0.0) {
+      pos -= (camRot * vec4(eyeDist, vec3(0.0))).xyz;
+      uv.x -= 0.5;
+    } else {
+      pos += (camRot * vec4(eyeDist, vec3(0.0))).xyz;
+      uv.x += 0.5;
+    }
+    if (flipEyes) pos *= -1.0;
+    pos += camPos;
+    fcolor = color(uv, pos);
+  } else if (anaglyph3d) {
+    vec3 eyeDir = (camRot * vec4(eyeDist, vec3(0.0))).xyz;
+    if (flipEyes) eyeDir *= -1.0;
+    fcolor = color(uv, camPos + eyeDir) * vec4(0.0, 1.0, 1.0, 1.0);
+    fcolor += color(uv, camPos - eyeDir) * vec4(1.0, 0.0, 0.0, 0.0);
+  } else {
+    fcolor = color(uv, camPos);
+  }
 }

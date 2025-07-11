@@ -79,6 +79,10 @@ function setSlidersToValues() {
   let smooth = document.getElementById("smooth");
   let isoCam = document.getElementById("isoCam");
   let moveSpeed = document.getElementById("moveSpeed");
+  let sbs3d = document.getElementById("sbs3d");
+  let anaglyph3d = document.getElementById("anaglyph3d");
+  let flipEyes = document.getElementById("flipEyes");
+  let eyeDist = document.getElementById("eyeDist");
   resModifier.value = Math.log2(options.resModifier);
   renderDist.value = Math.log2(options.renderDist);
   worldRes.value = Math.log2(options.worldRes);
@@ -86,6 +90,10 @@ function setSlidersToValues() {
   smooth.checked = options.smooth;
   isoCam.checked = options.isoCam;
   moveSpeed.value = Math.log2(options.moveSpeed);
+  sbs3d.checked = options.sbs3d;
+  anaglyph3d.checked = options.anaglyph3d;
+  flipEyes.checked = options.flipEyes;
+  eyeDist.value = options.eyeDist;
   resModifier.oninput();
   renderDist.oninput();
   worldRes.oninput();
@@ -93,6 +101,10 @@ function setSlidersToValues() {
   // smooth.onchange();
   // isoCam.onchange();
   moveSpeed.oninput();
+  sbs3d.oninput();
+  anaglyph3d.oninput();
+  flipEyes.oninput();
+  eyeDist.oninput();
 }
 
 function panic() {
@@ -186,7 +198,7 @@ function loadCode() {
 }
 
 async function loadExample(example) {
-  userCode.value = await fetch("./examples/" + example + ".glsl").then((response) => response.text());
+  userCode.value = await fetch("./examples/" + example + ".glsl", {cache: "no-store"}).then((response) => response.text());
   localStorage.setItem("VXEediting", example);
   displays.currentFile.innerText = localStorage.getItem("VXEediting");
   compileProgram();
