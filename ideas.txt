@@ -1,0 +1,15 @@
+-- todo --
+partially transparent voxels to make volumetrics
+allow to calculate data as a different program then pass it in as a texture
+add partial shadows to add depth
+add time control to pannel
+make stereoscopy support a 'embesled' look
+make anaglyph desaturate to make image softer on eyes
+
+-- world ideas --
+Temple - a long temple with pillars stretching as far as you can see into the gray sky
+Mountains - hilly spotty terrain as far as the eye can see, with a blue sky that gets bluer the further up you look
+Stars - random white spots in the dark abyss
+Caves - caves generated with perlin noise, dark and gloomy
+Clouds - 3d perlin noise again, but weighted to y = 30, with clipping where all values could only be 0 or less
+Outside - Mountains + clouds, a beutiful vista to look out upon

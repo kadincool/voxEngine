@@ -1,0 +1,10 @@
+properties {
+  shadows: true,
+  sunDir: (1, 1, 1),
+  staticSky: true, // set to false to use skybox function
+  skyColor: (0, 0.5, 1),
+}
+
+noise(pos: v3, seed: f) {
+  // code goes here
+}

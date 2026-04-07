@@ -45,29 +45,23 @@ function fullscreenPannel() {
 
 function togglePause() {
   let paused = document.getElementById("paused");
-  let button = document.getElementById("pauseButton")
   running = !running;
   displays.paused.innerText = !running;
   if (running) {
     paused.style.display = "none";
-    button.innerText = "pause";
   } else {
     paused.style.display = "block";
-    button.innerText = "play";
   }
 }
 
 function setPaused(pause = true) {
   let paused = document.getElementById("paused");
-  let button = document.getElementById("pauseButton")
   running = !pause;
   displays.paused.innerText = !running;
   if (running) {
     paused.style.display = "none";
-    button.innerText = "pause";
   } else {
     paused.style.display = "block";
-    button.innerText = "play";
   }
 }
 
@@ -76,46 +70,48 @@ function setSlidersToValues() {
   let renderDist = document.getElementById("renderDist");
   let worldRes = document.getElementById("worldRes");
   let fov = document.getElementById("fov");
-  let smooth = document.getElementById("smooth");
   let isoCam = document.getElementById("isoCam");
   let moveSpeed = document.getElementById("moveSpeed");
-  let sbs3d = document.getElementById("sbs3d");
-  let anaglyph3d = document.getElementById("anaglyph3d");
+  let stereoscopy = document.getElementById("stereoscopy");
   let flipEyes = document.getElementById("flipEyes");
   let eyeDist = document.getElementById("eyeDist");
+  
   resModifier.value = Math.log2(options.resModifier);
   renderDist.value = Math.log2(options.renderDist);
   worldRes.value = Math.log2(options.worldRes);
   fov.value = options.fov;
-  smooth.checked = options.smooth;
   isoCam.checked = options.isoCam;
   moveSpeed.value = Math.log2(options.moveSpeed);
-  sbs3d.checked = options.sbs3d;
-  anaglyph3d.checked = options.anaglyph3d;
+  stereoscopy.checked = options.stereoscopy;
   flipEyes.checked = options.flipEyes;
   eyeDist.value = options.eyeDist;
+  
   resModifier.oninput();
   renderDist.oninput();
   worldRes.oninput();
   fov.oninput();
-  // smooth.onchange();
-  // isoCam.onchange();
+  isoCam.onchange();
   moveSpeed.oninput();
-  sbs3d.oninput();
-  anaglyph3d.oninput();
-  flipEyes.oninput();
   eyeDist.oninput();
 }
 
-function panic() {
-  setPaused();
-  let resSlider = document.getElementById("resModifier");
-  let distSlider = document.getElementById("renderDist");
-  resSlider.value = resSlider.min;
-  distSlider.value = distSlider.min;
-  resSlider.oninput();
-  distSlider.oninput();
+function toggleElement(elemName) {
+  let elem = document.getElementById(elemName);
+  if (elem.style.display == "none")
+    elem.style.display = "block";
+  else
+    elem.style.display = "none";
 }
+
+// function panic() {
+//   setPaused();
+//   let resSlider = document.getElementById("resModifier");
+//   let distSlider = document.getElementById("renderDist");
+//   resSlider.value = resSlider.min;
+//   distSlider.value = distSlider.min;
+//   resSlider.oninput();
+//   distSlider.oninput();
+// }
 
 function saveOptions() {
   localStorage.setItem("VXEoptions", JSON.stringify(options));
@@ -136,6 +132,9 @@ function loadOptions() {
   // resetRot();
 }
 
+// TODO: fix file loading system
+
+// code functions
 function quickLoadCode() { // init
   let code = localStorage.getItem("VXEautosave");
   if (code == null) {
@@ -153,7 +152,7 @@ function quickSaveCode() {
 
 const sysFiles = ["default", "list", "rlist"]; 
 const examples = ["blank", "graph2d", "graph3d", "sdfexample", "world"];
-// TODO make example files to load from
+// TODO make more example files to load from
 let ownFiles = [];
 
 function loadCode() {

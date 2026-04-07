@@ -55,6 +55,13 @@ canvas {
 p, h1 {
   margin: 0;
 }
+p, img {
+  margin-top: 10px;
+}
+
+small {
+  font-size: 10px;
+}
 #userCode {
   box-sizing: border-box;
   /* min-width: 280px;
@@ -62,7 +69,7 @@ p, h1 {
   /* min-height: 50vh; */
   width: 100%;
   /* height: 50vh; */
-  height: 380px;
+  height: calc(400px - 20px);
   resize: none;
   margin-top: 10px;
   white-space: nowrap;
@@ -89,7 +96,46 @@ p, h1 {
   border-style: solid;
   margin-bottom: 2px;
   color: white;
+/*   font: 12pt, serif; */
 }
 #config button:hover {
   background-color: rgb(0, 143, 191);
+}
+
+.clickable {
+  text-decoration: underline;
+  cursor: pointer;
+  user-select: none;
+  color: yellow;
+}
+
+.clickable:hover {
+  color: white;
+}
+
+.whiteclickable {
+  text-decoration: underline;
+  cursor: pointer;
+  user-select: none;
+  color: white;
+}
+
+.whiteclickable:hover {
+  color: yellow;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: lime;
+}
+
+.blue {
+  color: cyan;
+}
+
+.white {
+  color: white;
 }
