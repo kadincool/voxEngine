@@ -78,13 +78,16 @@
   <h1><span class="whiteclickable" onclick="toggleElement('program');">Program:</span></h1>
   <div id="program">
     <p><span class="clickable" onclick="toggleElement('programoptions');">Editing:</span> <span class="display" ref="currentFile">file</span></p>
-    <div id="programoptions" style="display:none">
-      <button onclick="compileProgram()">Run</button>
+    <div id="programoptions"> <!--style="display:none"-->
+      <!--<button onclick="compileProgram()">Run</button>
       <button onclick="saveCode()">Save</button>
       <button onclick="saveCodeAs()">Save As</button><br>
       <button onclick="loadCode()">Load</button>
       <button onclick="importCode()">Import</button>
-      <button onclick="exportCode()">Export</button>
+      <button onclick="exportCode()">Export</button>-->
+      <p><span class="clickable" onclick=compileProgram()>[▶️ Run!]</span> <span class="clickable" onclick=saveCode()>[💾 Save!]</span></p>
+      <p><span class="clickable" onclick=saveCodeAs()>[➕ Save as...]</span> <span class="clickable" onclick=loadCode()>[📂 Load...]</span></p>
+      <p><span class="clickable" onclick=importCode()>[📥 Import...]</span> <span class="clickable" onclick=exportCode()>[📤 Export...]</span></p>
     </div>
     <div id="errorList"></div>
     <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>

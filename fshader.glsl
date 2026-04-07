@@ -153,7 +153,7 @@ vec3 raycast(vec3 startPos, vec3 startDir) {
     float nextStep = min(min(distances.x, distances.y), distances.z);
     
     if (tileColor.w != 0.0) {
-      float newTint = 1.0 - pow(1.0 - tileColor.w, nextStep);
+      float newTint = 1.0 - pow(1.0 - tileColor.w, nextStep / worldRes);
       vec3 newColor = mix(tileColor.xyz, fogColor, travelled / renderDist);
       float addTint = newTint * (1.0 - rayColor.w);
       float totalTint = rayColor.w + addTint;

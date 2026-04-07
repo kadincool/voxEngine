@@ -352,14 +352,18 @@ document.addEventListener("keyup", (e) => {if (mouseHover) keys[e.code] = false;
 canvas.addEventListener("mousedown", (e) => {
   if (document.hasFocus()) 
     canvas.requestPointerLock()
+    document.getElementById("doNothing").focus();
+    textAreaFocused = false;
 });
 canvas.addEventListener("mouseenter", (e) => {
-  mouseHover = true;
-  document.getElementById("doNothing").focus();
-  textAreaFocused = false;
+  if (!textAreaFocused) {
+    document.getElementById("doNothing").focus();
+    mouseHover = true;
+  }
   // canvas.focus();
 });
 canvas.addEventListener("mouseleave", (e) => {mouseHover = false; keys = {};});
+
 document.addEventListener("pointerlockchange", (e) => {
   mouseLocked = Boolean(document.pointerLockElement);
   if (mouseLocked) mouseHover = true;
