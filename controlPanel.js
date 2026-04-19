@@ -9,6 +9,7 @@ let displays = {};
 let config;
 let editing = "";
 const userCode = document.getElementById("userCode");
+let userCodeContext;
 
 document.addEventListener("DOMContentLoaded", (e) => {
   config = document.getElementById("config");
@@ -21,6 +22,21 @@ document.addEventListener("DOMContentLoaded", (e) => {
   for (let setting of settings) {
     if (setting.oninput) setting.oninput();
     if (setting.onchange) setting.onchange();
+  }
+  if (CodeMirror) {
+      userCodeContext = CodeMirror.fromTextArea(userCode, {
+      lineNumbers: true, 
+      theme: "transparent", 
+      foldGutter: true, 
+      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"], 
+      fixedGutter: false, 
+      tabSize: 2,
+      smartIndent: false,
+    });
+    userCodeContext.on("focus", (e) => {
+      textAreaFocused = true;
+      keys = {};
+    });
   }
 });
 
@@ -129,7 +145,10 @@ function quickLoadCode() { // init
   if (code == null) {
     code = fshaderSplit[1];
   }
-  userCode.value = code;
+  if (userCodeContext)
+    userCodeContext.setValue(code);
+  else
+    userCode.value = code;
   if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "_default");
   editing = localStorage.getItem("VXEediting")
   displays.currentFile.innerText = editing;
@@ -137,7 +156,10 @@ function quickLoadCode() { // init
 
 function quickSaveCode() {
   localStorage.setItem("VXEediting", editing);
-  localStorage.setItem("VXEautosave", userCode.value);
+  if (userCodeContext)
+    localStorage.setItem("VXEautosave", userCodeContext.getValue());
+  else
+    localStorage.setItem("VXEautosave", userCode.value);
 }
 
 let examples = [];
@@ -163,7 +185,10 @@ async function loadCode() {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }
-    userCode.value = fshaderSplit[1];
+    if (userCodeContext)
+      userCodeContext.setValue(fshaderSplit[1]);
+    else
+      userCode.value = fshaderSplit[1];
   } else if (loadedFileName[0] == "_") {
     let code = await loadExample(loadedFileName);
     if (!code.ok) {
@@ -173,7 +198,10 @@ async function loadCode() {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }
-    userCode.value = code.code;
+    if (userCodeContext)
+      userCodeContext.setValue(code.code);
+    else
+      userCode.value = code.code;
   } else {
     let code = localStorage.getItem("VXEP" + loadedFileName);
     if (!code) {
@@ -183,7 +211,10 @@ async function loadCode() {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }
-    userCode.value = code;
+    if (userCodeContext)
+      userCodeContext.setValue(code);
+    else
+      userCode.value = code;
   }
   editing = loadedFileName;
   localStorage.setItem("VXEediting", editing);
@@ -210,7 +241,10 @@ function saveCode() {
     saveCodeAs();
     return;
   }
-  localStorage.setItem("VXEP" + currentFile, userCode.value);
+  if (userCodeContext)
+    localStorage.setItem("VXEP" + currentFile, userCodeContext.getValue());
+  else
+    localStorage.setItem("VXEP" + currentFile, userCode.value);
 }
 
 function saveCodeAs(name) {
@@ -280,7 +314,11 @@ function exportCode() {
   keys = {};
   let filename = editing + ".glsl";
   localStorage.setItem("VXEediting", editing);
-  let fileContent = userCode.value;
+  let fileContent;
+  if (userCodeContext)
+    fileContent = userCodeContext.getValue();
+  else
+    fileContent = userCode.value;
   let file = new Blob([fileContent], {type: "text/plain"});
   saveBlob(file, filename);
 }

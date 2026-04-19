@@ -72,7 +72,10 @@ async function fetchFiles() {
 
 function compileProgram() {
   quickSaveCode();
-  fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
+  if (userCodeContext)
+    fshaderSrc = fshaderSplit[0] + userCodeContext.getValue() + fshaderSplit[2];
+  else
+    fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
   makeShaderProgram();
   setPaused(false);
 }
