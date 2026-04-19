@@ -5,80 +5,89 @@
   <h1>Paused</h1>
 </div>
 <div id="config">
-  <!-- <p id="warning">WARNING: using this program for extended periods time seems to cause the GPU to misbahave. Use with caution.</p> -->
-  <h1>Controls:</h1>
-  <p>W/A/S/D to move</p>
-  <p>E to elevate, Q to drop</p>
-  <p>Shift to speed up</p>
-  <p>Arrows to look</p>
-  <p>Click to look with mouse</p>
-  <p>P to pause, Ctrl + O to panic!</p>
-  <p>Space to toggle this menu</p>
-  <hr>
-  <h1>Runtime:</h1>
-  <p>Paused: <span class="display" ref="paused">false</span></p>
-  <button id="pauseButton" onclick="togglePause()">pause</button>
-  <button onclick="render()">render frame</button>
-  <button onclick="panic()">PANIC!</button>
-  <!-- <p>Render time: <span class="display" ref="renderTime">unset</span></p> -->
-  <p>Position: x: <span class="display" ref="posX">0</span>, y: <span class="display" ref="posY">0</span>, z: <span class="display" ref="posZ">0</span></p>
-  <p>Rotation: x: <span class="display" ref="rotX">0</span>, y: <span class="display" ref="rotY">0</span>, z: <span class="display" ref="rotZ">0</span></p>
-  <button onclick="resetPos()">reset position</button>
-  <button onclick="resetRot()">reset rotation</button>
-  <button onclick="setPos()">go to position</button>
-  <button onclick="setRot()">set rotation</button>
-  <button onclick="gridSnap()">snap</button>
-  <!-- TODO add time control -->
-  <p>Auto move: </p>
-  <p>Forward:<input type="checkbox" autocomplete="off" onchange="autoMove.forward = this.checked">
-  Backward:<input type="checkbox" autocomplete="off" onchange="autoMove.backward = this.checked"></p>
-  <p>Left:<input type="checkbox" autocomplete="off" onchange="autoMove.left = this.checked">
-  Right:<input type="checkbox" autocomplete="off" onchange="autoMove.right = this.checked"></p>
-  <p>Up:<input type="checkbox" autocomplete="off" onchange="autoMove.up = this.checked">
-  Down:<input type="checkbox" autocomplete="off" onchange="autoMove.down = this.checked"></p>
-  <p>Speed:<input type="checkbox" autocomplete="off" onchange="autoMove.speed = this.checked"></p>
-  <button onclick="takeScreenshot()">take screenshot</button>
-  <button onclick="loadOptions()">reload settings</button>
-  <hr>
-  <h1>Parameters:</h1>
-  <div>
-    <p>resolution: <span class="display" ref="resModifier">2</span></p>
-    <input class="setting" type="range" min="-3" max="2" value="-1" autocomplete="off" id="resModifier" oninput="update(this, 2 ** this.value)">
-    <p>render distance: <span class="display" ref="renderDist">128</span></p>
-    <input class="setting" type="range" min="4" max="13" value="7" autocomplete="off" id="renderDist" oninput="update(this, 2 ** this.value)">
-    <p>world resolution: <span class="display" ref="worldRes">128</span></p>
-    <input class="setting" type="range" min="0" max="4" value="0" autocomplete="off" id="worldRes" oninput="update(this, 2 ** this.value)">
-    <p>FOV: <span class="display" ref="fov">90</span></p>
-    <input class="setting" type="range" min="10" max="170" step="10" value="90" autocomplete="off" id="fov" oninput="update(this, this.value)">
-    <p>smoothed: <input class="setting" type="checkbox" autocomplete="off" id="smooth" onchange="update(this, this.checked)"></p>
-    <p>isometric: <input class="setting" type="checkbox" autocomplete="off" id="isoCam" onchange="update(this, this.checked); resetRot()"></p>
-    <p>move speed: <span class="display" ref="moveSpeed">4</span></p>
-    <input class="setting" type="range" min="0" max="8" value="4" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
-    <p>side by side 3d: <input class="setting" type="checkbox" autocomplete="off" id="sbs3d" onchange="update(this, this.checked)"></p>
-    <p>anaglyph 3d: <input class="setting" type="checkbox" autocomplete="off" id="anaglyph3d" onchange="update(this, this.checked);"></p>
-    <p>flip eyes: <input class="setting" type="checkbox" autocomplete="off" id="flipEyes" onchange="update(this, this.checked);"></p>
-    <p>eye distance: <span class="display" ref="eyeDist">0.5</span></p>
-    <input class="setting" type="range" min="0" max="4" value="0.5" step="0.1" autocomplete="off" id="eyeDist" oninput="update(this, this.value)">
+  <h1><span class="whiteclickable" onclick="toggleElement('controls');">Controls:</span></h1>
+  <div id="controls">
+    <p>W/A/S/D to move</p>
+    <p>E to elevate, Q to drop</p>
+    <p>Click to look with mouse</p>
+    <p>P to pause</p>
+    <p>Space to toggle this menu</p>
+    <p>This menu can be resized</p>
   </div>
   <hr>
-  <!-- <h1>Shelved</h1>
-  <p>I made this project in about a weekend, which is the most work ive done in such a short period of time!</p>
-  <p>While giving me a much needed boost in confidence, it also means ive gotten burnt out of the project.</p>
-  <p>This project was really fun to work on, far exceeding my expectations of what I was trying to make, however I am a full time college student so I need to study.</p>
-  <p>For now, I made this world to be explored, I recommend keeping the world res at 1 without smoothing to see this the way I meant for it to be seen.</p>
-  <p>I may return to this project in the near future to add some things, notably a code editor to change the way the world is calculated.</p>
-  <p>Hope you enjoy -Kadin</p>
-  <a href="https://kadincool.github.io">kadincool.github.io</a> -->
-  <h1>Program:</h1>
-  <p>Editing: <span class="display" ref="currentFile">file</span></p>
-  <button onclick="saveCode()">save</button>
-  <button onclick="loadCode()">load</button>
-  <button onclick="saveCodeAs()">save as</button><br>
-  <button onclick="compileProgram()">run</button>
-  <button onclick="importCode()">import</button>
-  <button onclick="exportCode()">export</button>
-  <div id="errorList"></div>
-  <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>
+  <h1><span class="whiteclickable" onclick="toggleElement('runtime');">Runtime:</span></h1>
+  <div id="runtime">
+    <p><span class="clickable" onclick=togglePause()>Paused:</span> 
+      <span class="display" ref="paused">false</span></p>
+    <p>FPS: <span class="display" ref="renderTime">unset</span></p>
+    <p><span class="clickable" onclick=setPos()>Position:</span> 
+      X: <span class="display red" ref="posX">0</span>, 
+      Y: <span class="display green" ref="posY">0</span>, 
+      Z: <span class="display blue" ref="posZ">0</span>
+    </p>
+    <p><span class="clickable" onclick=rotSnap()>Rotation:</span> 
+      X: <span class="display red" ref="rotX">0</span>, 
+      Y: <span class="display green" ref="rotY">0</span>
+    </p>
+    <p class="clickable" onclick=takeScreenshot()>Take Screenshot</p>
+  </div>
+  <hr>
+  <h1><span class="whiteclickable" onclick="toggleElement('params');">Parameters:</span></h1>
+  <div id="params">
+    <p>Resolution: <span class="display" ref="resModifier">1</span></p>
+      <input class="setting" type="range" min="-3" max="0" value="-1" autocomplete="off" id="resModifier" oninput="update(this, 2 ** this.value)">
+    <p>Render distance: <span class="display" ref="renderDist">128</span></p>
+      <input class="setting" type="range" min="4" max="13" value="7" autocomplete="off" id="renderDist" oninput="update(this, 2 ** this.value)">
+    <p>FOV: <span class="display" ref="fov">90</span></p>
+      <input class="setting" type="range" min="10" max="170" step="10" value="90" autocomplete="off" id="fov" oninput="update(this, this.value)">
+    <p>Move Speed: <span class="display" ref="moveSpeed">4</span></p>
+      <input class="setting" type="range" min="0" max="8" value="4" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
+    <h2><span class="clickable" onclick="toggleElement('advanced');">Advanced:</span></h2>
+    <div id="advanced" style="display:none">
+      <p>Isometric: <input class="setting" type="checkbox" autocomplete="off" id="isoCam" onchange="update(this, this.checked); resetRot()"></p>
+      <p>Stereoscopy: <input class="setting" type="checkbox" autocomplete="off" id="stereoscopy" onchange="update(this, this.checked)"></p>
+      <p>Flip Eyes: <input class="setting" type="checkbox" autocomplete="off" id="flipEyes" onchange="update(this, this.checked);"></p>
+      <p>Eye Distance: <span class="display" ref="eyeDist">0.5</span></p>
+        <input class="setting" type="range" min="0" max="4" value="0.5" step="0.1" autocomplete="off" id="eyeDist" oninput="update(this, this.value)">
+      <p class="orange">Warning: These next 2 settings might cause certain things to look wrong in some programs.</p>
+      <p>World Resolution: <span class="display" ref="worldRes">128</span></p>
+        <input class="setting" type="range" min="0" max="4" value="0" autocomplete="off" id="worldRes" oninput="update(this, 2 ** this.value)">
+      <p>Smoothed: <input class="setting" type="checkbox" autocomplete="off" id="smooth" onchange="update(this, this.checked)"></p>
+      <p class="red">Warning: This setting WILL cause ALL things to look wrong in ALL programs. (resets on refresh)</p>
+      <p>Glitch Mode: <input class="setting" type="checkbox" autocomplete="off" id="glitchVis" onchange="update(this, this.checked)"></p>
+    </div>
+  </div>
+  <hr>
+  <h1><span class="whiteclickable" onclick="toggleElement('about');">About:</span></h1>
+  <div id="about" style="display: none;">
+    <p>The idea for this came more or less before I even really knew how to program, barely even knowing how to type.</p>
+    <p>From what I remember, I came up with the idea when we learned about slope in algebra. I asked about flipping X and Y and doing run/rise instead of rise/run. They said that was calculus-level math, which confused me because of how simple it felt.</p>
+    <p>The idea stuck with me. Whenever I was bored in class, my go-to thought was to imagine a line going through a graph, passing through the gridlines until one of them was full. I even tried (and failed) to implement it in Pico-8 once!</p>
+    <p>I also pondered upon a 3D version of this idea, a light ray traversing through cubes. This idea coincided with me thinking about how my project at the time, Interactive Blockscape, could really benefit from a 3D environment, and how I didn't have many other good options to render it.</p>
+    <p>I worked on a little raycaster in a "raycast" folder in there. It was slow, but it worked, though I realised I couldn't figure out how to use WebGL2 properly and then went on a little sidequest to learn it.</p>
+    <p>About a year or two later, I then revisited the idea, now knowing a fair amount more of WebGL, though also burned on classes, I made the original version of this!</p>
+    <p>I really pushed my ability to create, doing some things that felt "wrong", but in the end I created something that I prior could only dream of, definitely one of the glowing pillars of my web portfolio. By this point I had my fill, however I did come back a few more times to add things like stereoscopy.</p>
+    <p>That leads to recently, where voxels fascinated me again. I wanted to do less if conditions so that the GPU could handle it better, and I came up with the idea of flipping the world so the ray travelled positively on each axis. This time was really exciting, because I liked the idea of how fast and clean it would be, although I also wanted to take this opportunity to do something else that interested me, volumetric fog!</p>
+    <p>The idea was simple; Because the ray was travelling through voxels, just make some of them semi-transparent, so it obscures what is behind it. Based on how much the ray travelled through the volume, it would get more obscured.</p>
+    <p>When implementing that, it looked as good as I imagined, and I knew that justified coming back to VoxEngine to use the new renderer.</p>
+    <p>And so now in the voxel function, you can set voxels to partial alpha values to change how visible they are.</p>
+    <p><small>Note: I was not the first person to come up with this idea, but I did come up with it independently. It is more commonly known as Voxel Ray Traversal and traces back to John Amanatides and Andrew Woo's <a class="clickable" target="_blank" href="https://www.researchgate.net/publication/2611491_A_Fast_Voxel_Traversal_Algorithm_for_Ray_Tracing">paper</a> from 1987.</small></p>
+    <p>Hope you enjoy -Kadin</p>
+    <p><a class="clickable" target="_blank" href="https://kadincool.github.io">kadincool.github.io</a></p>
+    <a target="_blank" href="https://brainmade.org/"><img alt="brainmade.org" src="https://brainmade.org/88x31-dark.png"></a>
+  </div>
+  <hr>
+  <h1><span class="whiteclickable" onclick="toggleElement('program');">Program:</span></h1>
+  <div id="program">
+    <p><span class="clickable" onclick="toggleElement('programoptions');">Editing:</span> <span class="display" ref="currentFile">file</span></p>
+    <div id="programoptions">
+      <p><span class="clickable" onclick=compileProgram()>[▶️ Run!]</span> <span class="clickable" onclick=saveCode()>[💾 Save!]</span></p>
+      <p><span class="clickable" onclick=saveCodeAs()>[➕ Save as...]</span> <span class="clickable" onclick=loadCode()>[📂 Load...]</span></p>
+      <p><span class="clickable" onclick=importCode()>[📥 Import...]</span> <span class="clickable" onclick=exportCode()>[📤 Export...]</span></p>
+    </div>
+    <div id="errorList"></div>
+    <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>
+  </div>
 </div>
 <button id="doNothing"></button>
 <script src="./gl.js"></script>

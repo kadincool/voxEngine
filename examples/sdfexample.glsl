@@ -1,3 +1,5 @@
+// see: https://iquilezles.org/articles/raymarchingdf/
+
 // SDFs
 float SDFSphere(vec3 pos, float rad) {
   return length(pos) - rad;
