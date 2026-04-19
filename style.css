@@ -71,6 +71,7 @@ small {
   width: 100%;
   /* height: 50vh; */
   height: calc(400px - 20px);
+/*   height: calc(100% - 20px); */
   resize: none;
   margin-top: 10px;
   white-space: nowrap;
@@ -133,6 +134,10 @@ small {
 
 .red {
   color: red;
+}
+
+.orange {
+  color: orange;
 }
 
 .green {

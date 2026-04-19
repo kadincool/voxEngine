@@ -44,21 +44,23 @@
       <input class="setting" type="range" min="0" max="8" value="4" autocomplete="off" id="moveSpeed" oninput="update(this, 2 ** this.value)">
     <h2><span class="clickable" onclick="toggleElement('advanced');">Advanced:</span></h2>
     <div id="advanced" style="display:none">
-      <p>World Resolution: <span class="display" ref="worldRes">128</span></p>
-        <input class="setting" type="range" min="0" max="4" value="0" autocomplete="off" id="worldRes" oninput="update(this, 2 ** this.value)">
       <p>Isometric: <input class="setting" type="checkbox" autocomplete="off" id="isoCam" onchange="update(this, this.checked); resetRot()"></p>
-<!--       <p>Smoothed: <input class="setting" type="checkbox" autocomplete="off" id="smooth" onchange="update(this, this.checked)"></p> -->
       <p>Stereoscopy: <input class="setting" type="checkbox" autocomplete="off" id="stereoscopy" onchange="update(this, this.checked)"></p>
-      <!--<p>anaglyph 3d: <input class="setting" type="checkbox" autocomplete="off" id="anaglyph3d" onchange="update(this, this.checked);"></p>-->
       <p>Flip Eyes: <input class="setting" type="checkbox" autocomplete="off" id="flipEyes" onchange="update(this, this.checked);"></p>
       <p>Eye Distance: <span class="display" ref="eyeDist">0.5</span></p>
         <input class="setting" type="range" min="0" max="4" value="0.5" step="0.1" autocomplete="off" id="eyeDist" oninput="update(this, this.value)">
+      <p class="orange">Warning: These next 2 settings might cause certain things to look wrong in some programs.</p>
+      <p>World Resolution: <span class="display" ref="worldRes">128</span></p>
+        <input class="setting" type="range" min="0" max="4" value="0" autocomplete="off" id="worldRes" oninput="update(this, 2 ** this.value)">
+      <p>Smoothed: <input class="setting" type="checkbox" autocomplete="off" id="smooth" onchange="update(this, this.checked)"></p>
+      <p class="red">Warning: This setting WILL cause ALL things to look wrong in ALL programs. (resets on refresh)</p>
+      <p>Glitch Mode: <input class="setting" type="checkbox" autocomplete="off" id="glitchVis" onchange="update(this, this.checked)"></p>
     </div>
   </div>
   <hr>
   <h1><span class="whiteclickable" onclick="toggleElement('about');">About:</span></h1>
   <div id="about" style="display: none;">
-    <p>The idea for this came more or less before I even really knew how to program, barely knowing how to use even Scratch.</p>
+    <p>The idea for this came more or less before I even really knew how to program, barely even knowing how to type.</p>
     <p>From what I remember, I came up with the idea when we learned about slope in algebra. I asked about flipping X and Y and doing run/rise instead of rise/run. They said that was calculus-level math, which confused me because of how simple it felt.</p>
     <p>The idea stuck with me. Whenever I was bored in class, my go-to thought was to imagine a line going through a graph, passing through the gridlines until one of them was full. I even tried (and failed) to implement it in Pico-8 once!</p>
     <p>I also pondered upon a 3D version of this idea, a light ray traversing through cubes. This idea coincided with me thinking about how my project at the time, Interactive Blockscape, could really benefit from a 3D environment, and how I didn't have many other good options to render it.</p>
@@ -78,13 +80,7 @@
   <h1><span class="whiteclickable" onclick="toggleElement('program');">Program:</span></h1>
   <div id="program">
     <p><span class="clickable" onclick="toggleElement('programoptions');">Editing:</span> <span class="display" ref="currentFile">file</span></p>
-    <div id="programoptions"> <!--style="display:none"-->
-      <!--<button onclick="compileProgram()">Run</button>
-      <button onclick="saveCode()">Save</button>
-      <button onclick="saveCodeAs()">Save As</button><br>
-      <button onclick="loadCode()">Load</button>
-      <button onclick="importCode()">Import</button>
-      <button onclick="exportCode()">Export</button>-->
+    <div id="programoptions">
       <p><span class="clickable" onclick=compileProgram()>[▶️ Run!]</span> <span class="clickable" onclick=saveCode()>[💾 Save!]</span></p>
       <p><span class="clickable" onclick=saveCodeAs()>[➕ Save as...]</span> <span class="clickable" onclick=loadCode()>[📂 Load...]</span></p>
       <p><span class="clickable" onclick=importCode()>[📥 Import...]</span> <span class="clickable" onclick=exportCode()>[📤 Export...]</span></p>

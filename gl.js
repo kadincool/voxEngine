@@ -15,7 +15,7 @@ let timer = 0;
 
 // shader variables
 const uniforms = ["sres", "time", "camPos", "camRot", "renderDist", "worldRes", "fovMult", 
-  "smoothed", "isometric", "stereoscopy", "eyeDist", "flipEyes"];
+  "smoothed", "isometric", "stereoscopy", "eyeDist", "flipEyes", "glitchVis"];
 let vshaderSrc;
 let fshaderSrc;
 let fshader;
@@ -44,7 +44,8 @@ let options = {
   isoCam: false,
   stereoscopy: false,
   eyeDist: 0.5,
-  flipEyes: false
+  flipEyes: false,
+  glitchVis: false,
 };
 let textAreaFocused = false;
 let mouseHover = false;
@@ -61,8 +62,8 @@ let autoMove = {
 };
 
 async function fetchFiles() {
-  vshaderSrc = await fetch("./vshader.glsl", {cache: "no-store"}).then((response) => response.text());
-  fshaderSrc = await fetch("./fshader.glsl", {cache: "no-store"}).then((response) => response.text());
+  vshaderSrc = await fetch("./vshader.glsl").then((response) => response.text());
+  fshaderSrc = await fetch("./fshader.glsl").then((response) => response.text());
   fshaderSplit = fshaderSrc.split(/\/\/ snip\r?\n/);
   quickLoadCode();
   compileProgram();
@@ -154,10 +155,12 @@ function render(takeScreenshot = false) {
   gl.uniform1f(context.renderDistUni, options.renderDist);
   gl.uniform1f(context.worldResUni, options.worldRes);
   gl.uniform1f(context.fovMultUni, Math.tan(fov / 360 * Math.PI));
+  gl.uniform1i(context.smoothedUni, options.smooth);
   gl.uniform1i(context.isometricUni, options.isoCam);
   gl.uniform1i(context.stereoscopyUni, options.stereoscopy);
   gl.uniform1f(context.eyeDistUni, options.eyeDist);
   gl.uniform1i(context.flipEyesUni, options.flipEyes);
+  gl.uniform1i(context.glitchVisUni, options.glitchVis);
 
   gl.bindVertexArray(vertArray);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -334,7 +337,10 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     saveCode();
   }
-  if (e.code == "Space") {
+  if (e.code == "Space" && e.ctrlKey) {
+    e.preventDefault();
+    fullscreenPannel();
+  } else if (e.code == "Space") {
     if (mouseHover) {
       togglePannel();
     }
@@ -344,7 +350,7 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.code == "KeyP" && e.ctrlKey) {
     e.preventDefault();
-    togglePause();
+    setPaused();
   }
 });
 document.addEventListener("keyup", (e) => {if (mouseHover) keys[e.code] = false;});

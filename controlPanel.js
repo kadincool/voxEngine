@@ -2,11 +2,12 @@ function update(param, value) {
   param = param.id;
   options[param] = value;
   if (displays[param]) displays[param].innerText = value;
-  if (running) saveOptions();
+  saveOptions();
 }
 
 let displays = {};
 let config;
+let editing = "";
 const userCode = document.getElementById("userCode");
 
 document.addEventListener("DOMContentLoaded", (e) => {
@@ -15,14 +16,12 @@ document.addEventListener("DOMContentLoaded", (e) => {
   for (let display of alldisplays) {
     displays[display.attributes.ref.value] = display;
   }
+  loadOptions();
   let settings = document.getElementsByClassName("setting");
-  // // console.log(settings);
   for (let setting of settings) {
-    // update(setting, setting.value);
     if (setting.oninput) setting.oninput();
     if (setting.onchange) setting.onchange();
   }
-  loadOptions();
 });
 
 function togglePannel() {
@@ -34,12 +33,10 @@ function togglePannel() {
 }
 
 function fullscreenPannel() {
-  if (config.style.width == Math.floor(window.innerWidth - 50) + "px") { // && config.style.height == Math.floor(window.innerHeight - 50) + "px"
+  if (config.style.width == Math.floor(window.innerWidth - 50) + "px") {
     config.style.width = "0px";
-    // config.style.height = "0px";
   } else {
     config.style.width = Math.floor(window.innerWidth - 50) + "px";
-    // config.style.height = Math.floor(window.innerHeight - 50) + "px";
   }
 }
 
@@ -70,21 +67,25 @@ function setSlidersToValues() {
   let renderDist = document.getElementById("renderDist");
   let worldRes = document.getElementById("worldRes");
   let fov = document.getElementById("fov");
+  let smooth = document.getElementById("smooth");
   let isoCam = document.getElementById("isoCam");
   let moveSpeed = document.getElementById("moveSpeed");
   let stereoscopy = document.getElementById("stereoscopy");
   let flipEyes = document.getElementById("flipEyes");
   let eyeDist = document.getElementById("eyeDist");
+  let glitchVis = document.getElementById("glitchVis");
   
   resModifier.value = Math.log2(options.resModifier);
   renderDist.value = Math.log2(options.renderDist);
   worldRes.value = Math.log2(options.worldRes);
   fov.value = options.fov;
+  smooth.checked = options.smooth;
   isoCam.checked = options.isoCam;
   moveSpeed.value = Math.log2(options.moveSpeed);
   stereoscopy.checked = options.stereoscopy;
   flipEyes.checked = options.flipEyes;
   eyeDist.value = options.eyeDist;
+  glitchVis.checked = options.glitchVis;
   
   resModifier.oninput();
   renderDist.oninput();
@@ -109,9 +110,12 @@ function saveOptions() {
 
 function loadOptions() {
   try {
-    let savedOptions = JSON.parse(localStorage.getItem("VXEoptions"))
+    let savedOptions = JSON.parse(localStorage.getItem("VXEoptions"));
     if (savedOptions) {
-      options = savedOptions;
+      for (option in savedOptions) {
+        options[option] = savedOptions[option];
+      }
+      options.glitchVis = false; // makes it fix on refresh
       setSlidersToValues();
     }
   } catch(err) {
@@ -126,15 +130,16 @@ function quickLoadCode() { // init
     code = fshaderSplit[1];
   }
   userCode.value = code;
-  if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "unnamed");
-  displays.currentFile.innerText = localStorage.getItem("VXEediting");
+  if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "_default");
+  editing = localStorage.getItem("VXEediting")
+  displays.currentFile.innerText = editing;
 }
 
 function quickSaveCode() {
+  localStorage.setItem("VXEediting", editing);
   localStorage.setItem("VXEautosave", userCode.value);
 }
 
-const sysFiles = ["default", "list"]; 
 let examples = [];
 
 async function fetchExamples() {
@@ -145,11 +150,11 @@ fetchExamples();
 
 async function loadCode() {
   keys = {};
-  let loadedFileName = prompt("Enter name for program (type 'list' for list):");
+  let loadedFileName = prompt("Enter name for program (type \"_list\" for list):");
   if (!loadedFileName) {
     return;
   }
-  if (loadedFileName == "list") {
+  if (loadedFileName == "_list") {
     let programs = getPrograms();
     alert(programs.join(" "));
     loadCode();
@@ -169,9 +174,6 @@ async function loadCode() {
       return;
     }
     userCode.value = code.code;
-  } else if (sysFiles.includes(loadedFileName)) {
-    alert("unavailable (you shouldn't be able to see this)");
-    return;
   } else {
     let code = localStorage.getItem("VXEP" + loadedFileName);
     if (!code) {
@@ -183,8 +185,9 @@ async function loadCode() {
     }
     userCode.value = code;
   }
-  localStorage.setItem("VXEediting", loadedFileName);
-  displays.currentFile.innerText = localStorage.getItem("VXEediting");
+  editing = loadedFileName;
+  localStorage.setItem("VXEediting", editing);
+  displays.currentFile.innerText = editing;
   compileProgram();
 }
 
@@ -198,12 +201,12 @@ async function loadExample(example) {
 
 function saveCode() {
   quickSaveCode();
-  let currentFile = localStorage.getItem("VXEediting");
+  let currentFile = editing;
   if (currentFile[0] == "_") {
     saveCodeAs(currentFile.slice(1));
     return;
   }
-  if (!currentFile || sysFiles.includes(currentFile)) {
+  if (!currentFile) {
     saveCodeAs();
     return;
   }
@@ -223,12 +226,14 @@ function saveCodeAs(name) {
     alert("must have name");
     return;
   }
-  if (loadedFileName[0] == "_") {
-    alert("reserved for examples!");
+  if (loadedFileName == "_list") {
+    let programs = getPrograms();
+    alert(programs.join(" "));
+    saveCodeAs();
     return;
   }
-  if (sysFiles.includes(loadedFileName)) {
-    alert("name unavailable");
+  if (loadedFileName[0] == "_") {
+    alert("reserved for examples!");
     return;
   }
   if (programs.includes(loadedFileName)) {
@@ -237,8 +242,9 @@ function saveCodeAs(name) {
   } else if (!confirm("Confirm saving " + loadedFileName)) {
     return;
   }
-  localStorage.setItem("VXEediting", loadedFileName);
-  displays.currentFile.innerText = localStorage.getItem("VXEediting");
+  editing = loadedFileName;
+  localStorage.setItem("VXEediting", editing);
+  displays.currentFile.innerText = editing;
   saveCode();
 }
 
@@ -257,8 +263,9 @@ function importCode() {
       reader.readAsText(file);
       reader.onload = function(event) {
         userCode.value = event.target.result;
-        localStorage.setItem("VXEediting", filename[0]);
-        displays.currentFile.innerText = localStorage.getItem("VXEediting");
+        editing = filename[0]
+        localStorage.setItem("VXEediting", editing);
+        displays.currentFile.innerText = editing;
         saveCode();
         compileProgram();
       }
@@ -271,7 +278,8 @@ function importCode() {
 
 function exportCode() {
   keys = {};
-  let filename = localStorage.getItem("VXEediting") + ".glsl";
+  let filename = editing + ".glsl";
+  localStorage.setItem("VXEediting", editing);
   let fileContent = userCode.value;
   let file = new Blob([fileContent], {type: "text/plain"});
   saveBlob(file, filename);
