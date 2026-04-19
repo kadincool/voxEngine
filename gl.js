@@ -14,25 +14,15 @@ let lastTime = Date.now();
 let timer = 0;
 
 // shader variables
+const uniforms = ["sres", "time", "camPos", "camRot", "renderDist", "worldRes", "fovMult", 
+  "smoothed", "isometric", "stereoscopy", "eyeDist", "flipEyes", "glitchVis"];
 let vshaderSrc;
 let fshaderSrc;
 let fshader;
 let vshader;
 let program;
 let posAttrib;
-let sresUni;
-let timeUni;
-let posUni;
-let rotUni;
-let renderDistUni;
-let worldResUni;
-let fovMultUni;
-let smoothedUni;
-let isometricUni;
-let sbs3dUni;
-let anaglyph3dUni;
-let eyeDistUni;
-let flipEyesUni;
+let context = {};
 
 let posBuffer;
 let vertArray;
@@ -52,10 +42,10 @@ let options = {
   smooth: false,
   fov: 90,
   isoCam: false,
-  sbs3d: false,
-  anaglyph3d: false,
+  stereoscopy: false,
   eyeDist: 0.5,
-  flipEyes: false
+  flipEyes: false,
+  glitchVis: false,
 };
 let textAreaFocused = false;
 let mouseHover = false;
@@ -70,17 +60,13 @@ let autoMove = {
   down: false,
   speed: false
 };
-// let takeScreenshot = false;
 
 async function fetchFiles() {
-  // loadOptions();
-  vshaderSrc = await fetch("./vshader.glsl", {cache: "no-store"}).then((response) => response.text());
-  fshaderSrc = await fetch("./fshader.glsl", {cache: "no-store"}).then((response) => response.text());
+  vshaderSrc = await fetch("./vshader.glsl").then((response) => response.text());
+  fshaderSrc = await fetch("./fshader.glsl").then((response) => response.text());
   fshaderSplit = fshaderSrc.split(/\/\/ snip\r?\n/);
   quickLoadCode();
-  // console.log(fshaderSplit);
   compileProgram();
-  // running = true;
   setPaused(false);
 } fetchFiles();
 
@@ -88,7 +74,6 @@ function compileProgram() {
   quickSaveCode();
   fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
   makeShaderProgram();
-  // TODO make last functional build that will compile and can be restored by loading restore
   setPaused(false);
 }
 
@@ -127,19 +112,9 @@ function makeShaderProgram() {
   
   // get attributes and uniforms
   posAttrib = gl.getAttribLocation(program, "vpos");
-  sresUni = gl.getUniformLocation(program, "sres");
-  timeUni = gl.getUniformLocation(program, "time");
-  posUni = gl.getUniformLocation(program, "camPos");
-  rotUni = gl.getUniformLocation(program, "camRot");
-  fovMultUni = gl.getUniformLocation(program, "fovMult");
-  renderDistUni = gl.getUniformLocation(program, "renderDist");
-  worldResUni = gl.getUniformLocation(program, "worldRes");
-  smoothedUni = gl.getUniformLocation(program, "smoothed");
-  isometricUni = gl.getUniformLocation(program, "isometric");
-  sbs3dUni = gl.getUniformLocation(program, "sbs3d");
-  anaglyph3dUni = gl.getUniformLocation(program, "anaglyph3d");
-  eyeDistUni = gl.getUniformLocation(program, "eyeDist");
-  flipEyesUni = gl.getUniformLocation(program, "flipEyes");
+  for (let uniform of uniforms) {
+    context[uniform+"Uni"] = gl.getUniformLocation(program, uniform);
+  }
   
   //buffer vertices
   posBuffer = gl.createBuffer();
@@ -155,22 +130,12 @@ function makeShaderProgram() {
   setPaused(!wasRunning);
 }
 
-// /./
-// gl.uniform2f(sresUni, canvas.width, canvas.height);
-
 function clamp(x, min, max) {
   return Math.min(Math.max(x, min), max);
 }
 
 function render(takeScreenshot = false) {
-  // let startTime = performance.now();
-  if (takeScreenshot) {
-    if (canvas.width != 1920 * options.resModifier) canvas.width = 1920 * options.resModifier;
-    if (canvas.height != 1080 * options.resModifier) canvas.height = 1080 * options.resModifier;
-  } else {
-    if (canvas.width != window.innerwidth * options.resModifier) canvas.width = window.innerWidth * options.resModifier;
-    if (canvas.height != window.innerHeight * options.resModifier) canvas.height = window.innerHeight * options.resModifier;
-  }
+  let startTime = performance.now();
   gl.viewport(0, 0, canvas.width, canvas.height);
   
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -179,34 +144,38 @@ function render(takeScreenshot = false) {
 
   let rotMat = new DOMMatrix();
   rotMat.rotateSelf(camRot.x, camRot.y, camRot.z);
+  
+  let fov = options.fov;
+  if (keys.KeyC) fov /= 2;
 
-  gl.uniform2f(sresUni, canvas.width, canvas.height);
-  gl.uniform3f(posUni, camPos.x, camPos.y, camPos.z);
-  gl.uniformMatrix4fv(rotUni, false, rotMat.toFloat32Array());
-  gl.uniform1f(timeUni, timer / 1000);
-  gl.uniform1f(renderDistUni, options.renderDist);
-  gl.uniform1f(worldResUni, options.worldRes);
-  gl.uniform1f(fovMultUni, Math.tan(options.fov / 360 * Math.PI));
-  gl.uniform1i(smoothedUni, options.smooth);
-  gl.uniform1i(isometricUni, options.isoCam);
-  gl.uniform1i(sbs3dUni, options.sbs3d);
-  gl.uniform1i(anaglyph3dUni, options.anaglyph3d);
-  gl.uniform1f(eyeDistUni, options.eyeDist);
-  gl.uniform1i(flipEyesUni, options.flipEyes);
+  gl.uniform2f(context.sresUni, canvas.width, canvas.height);
+  gl.uniform3f(context.camPosUni, camPos.x, camPos.y, camPos.z);
+  gl.uniformMatrix4fv(context.camRotUni, false, rotMat.toFloat32Array());
+  gl.uniform1f(context.timeUni, timer / 1000);
+  gl.uniform1f(context.renderDistUni, options.renderDist);
+  gl.uniform1f(context.worldResUni, options.worldRes);
+  gl.uniform1f(context.fovMultUni, Math.tan(fov / 360 * Math.PI));
+  gl.uniform1i(context.smoothedUni, options.smooth);
+  gl.uniform1i(context.isometricUni, options.isoCam);
+  gl.uniform1i(context.stereoscopyUni, options.stereoscopy);
+  gl.uniform1f(context.eyeDistUni, options.eyeDist);
+  gl.uniform1i(context.flipEyesUni, options.flipEyes);
+  gl.uniform1i(context.glitchVisUni, options.glitchVis);
 
   gl.bindVertexArray(vertArray);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
+  gl.finish();
+  let frameTime = performance.now() - startTime
+  displays.renderTime.innerText = `${(1000 / frameTime).toFixed(2)}`;
   
   if (takeScreenshot) {
     canvas.toBlob((blob) => saveBlob(blob, "VOXENGINE" + Date.now()));
-  } 
-  
-  // requestAnimationFrame((end) => {console.log(Math.round(end - startTime))});
+  }
 }
 
 function takeScreenshot() {
-  if (canvas.width != 1920 * options.resModifier) canvas.width = 1920 * options.resModifier;
-  if (canvas.height != 1080 * options.resModifier) canvas.height = 1080 * options.resModifier;
+  if (canvas.width != window.outerWidth) canvas.width = window.outerWidth;
+  if (canvas.height != window.outerHeight) canvas.height = window.outerHeight;
   render(true);
 }
 
@@ -219,12 +188,8 @@ function frame() {
 
     //movement
     let rotMat = new DOMMatrix();
-    // rotMat.rotateSelf(camRot.x, camRot.y, camRot.z);
-    // rotMat.rotateSelf(camRot.x, 0.0, 0.0);
     rotMat.rotateSelf(0.0, camRot.y, 0.0);
-    // rotMat.rotateSelf(0.0, 0.0, camRot.z);
 
-    // if (keys.Space) console.log(rotMat);
     let moveSpeed = options.moveSpeed * (keys.ShiftLeft || autoMove.speed ? 4 : 1); 
     let rotSpeed = options.rotSpeed * (keys.ShiftLeft ? 3 : 1); 
 
@@ -255,12 +220,12 @@ function frame() {
       camPos.y -= delta * moveSpeed;
     }
 
-    displays.posX.innerText = Math.floor(camPos.x * 1000) / 1000;
-    displays.posY.innerText = Math.floor(camPos.y * 1000) / 1000;
-    displays.posZ.innerText = Math.floor(camPos.z * 1000) / 1000;
-    displays.rotX.innerText = Math.floor(camRot.x * 1000) / 1000;
-    displays.rotY.innerText = Math.floor(camRot.y * 1000) / 1000;
-    displays.rotZ.innerText = Math.floor(camRot.z * 1000) / 1000;
+    displays.posX.innerText = camPos.x.toFixed(1);
+    displays.posY.innerText = camPos.y.toFixed(1);
+    displays.posZ.innerText = camPos.z.toFixed(1);
+    displays.rotX.innerText = camRot.x.toFixed(1);
+    displays.rotY.innerText = camRot.y.toFixed(1);
+    // displays.rotZ.innerText = camRot.z.toFixed(1);
 
     if (keys.ArrowLeft) camRot.y -= delta * rotSpeed;
     if (keys.ArrowRight) camRot.y += delta * rotSpeed;
@@ -280,13 +245,14 @@ function frame() {
 }
 frame();
 
+// Helper Functions
 function resetPos() {
   camPos.x = 0;
   camPos.y = 0;
   camPos.z = 0;
-  displays.posX.innerText = Math.floor(camPos.x * 1000) / 1000;
-  displays.posY.innerText = Math.floor(camPos.y * 1000) / 1000;
-  displays.posZ.innerText = Math.floor(camPos.z * 1000) / 1000;
+  displays.posX.innerText = camPos.x.toFixed(1);
+  displays.posY.innerText = camPos.y.toFixed(1);
+  displays.posZ.innerText = camPos.z.toFixed(1);
 }
 
 function setPos() {
@@ -294,9 +260,9 @@ function setPos() {
   camPos.x = Number(prompt("Position X:") || camPos.x);
   camPos.y = Number(prompt("Position Y:") || camPos.y);
   camPos.z = Number(prompt("Position Z:") || camPos.z);
-  displays.posX.innerText = Math.floor(camPos.x * 1000) / 1000;
-  displays.posY.innerText = Math.floor(camPos.y * 1000) / 1000;
-  displays.posZ.innerText = Math.floor(camPos.z * 1000) / 1000;
+  displays.posX.innerText = camPos.x.toFixed(1);
+  displays.posY.innerText = camPos.y.toFixed(1);
+  displays.posZ.innerText = camPos.z.toFixed(1);
 }
 
 function resetRot() {
@@ -307,9 +273,9 @@ function resetRot() {
     camRot.x = 45;
     camRot.y = 45;
   }
-  displays.rotX.innerText = Math.floor(camRot.x * 1000) / 1000;
-  displays.rotY.innerText = Math.floor(camRot.y * 1000) / 1000;
-  displays.rotZ.innerText = Math.floor(camRot.z * 1000) / 1000;
+  displays.rotX.innerText = camRot.x.toFixed(1);
+  displays.rotY.innerText = camRot.y.toFixed(1);
+  // displays.rotZ.innerText = camRot.z.toFixed(1);
 }
 
 function setRot() {
@@ -317,9 +283,9 @@ function setRot() {
   camRot.x = Number(prompt("Rotation X:") || camRot.x);
   camRot.y = Number(prompt("Rotation Y:") || camRot.y);
   camRot.z = Number(prompt("Rotation Z:") || camRot.z);
-  displays.rotX.innerText = Math.floor(camRot.x * 1000) / 1000;
-  displays.rotY.innerText = Math.floor(camRot.y * 1000) / 1000;
-  displays.rotZ.innerText = Math.floor(camRot.z * 1000) / 1000;
+  displays.rotX.innerText = camRot.x.toFixed(1);
+  displays.rotY.innerText = camRot.y.toFixed(1);
+  // displays.rotZ.innerText = camRot.z.toFixed(1);
 }
 
 function gridSnap() {
@@ -328,13 +294,20 @@ function gridSnap() {
   camPos.z = Math.round(camPos.z);
   camRot.x = Math.round(camRot.x / 15.0) * 15.0;
   camRot.y = Math.round(camRot.y / 15.0) * 15.0;
-  camRot.z = Math.round(camRot.z / 15.0) * 15.0;
-  displays.posX.innerText = Math.floor(camPos.x * 1000) / 1000;
-  displays.posY.innerText = Math.floor(camPos.y * 1000) / 1000;
-  displays.posZ.innerText = Math.floor(camPos.z * 1000) / 1000;
-  displays.rotX.innerText = Math.floor(camRot.x * 1000) / 1000;
-  displays.rotY.innerText = Math.floor(camRot.y * 1000) / 1000;
-  displays.rotZ.innerText = Math.floor(camRot.z * 1000) / 1000;
+  // camRot.z = Math.round(camRot.z / 15.0) * 15.0;
+  displays.posX.innerText = camPos.x.toFixed(1);
+  displays.posY.innerText = camPos.y.toFixed(1);
+  displays.posZ.innerText = camPos.z.toFixed(1);
+  displays.rotX.innerText = camRot.x.toFixed(1);
+  displays.rotY.innerText = camRot.y.toFixed(1);
+  // displays.rotZ.innerText = camRot.z.toFixed(1);
+}
+
+function rotSnap() {
+  camRot.x = Math.round(camRot.x / 15.0) * 15.0;
+  camRot.y = Math.round(camRot.y / 15.0) * 15.0;
+  displays.rotX.innerText = camRot.x.toFixed(1);
+  displays.rotY.innerText = camRot.y.toFixed(1);
 }
 
 async function saveBlob(blob, name) {
@@ -352,10 +325,10 @@ async function saveBlob(blob, name) {
 
 document.addEventListener("keydown", (e) => {
   if (mouseHover) keys[e.code] = true;
-  if (e.code == "KeyO" && e.ctrlKey) {
-    e.preventDefault();
-    panic();
-  }
+  // if (e.code == "KeyO" && e.ctrlKey) {
+  //   e.preventDefault();
+  //   panic(); // panic doesn't do much unfortunately
+  // }
   if (e.code == "KeyR" && e.ctrlKey) {
     e.preventDefault();
     compileProgram();
@@ -364,7 +337,10 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
     saveCode();
   }
-  if (e.code == "Space") {
+  if (e.code == "Space" && e.ctrlKey) {
+    e.preventDefault();
+    fullscreenPannel();
+  } else if (e.code == "Space") {
     if (mouseHover) {
       togglePannel();
     }
@@ -372,19 +348,28 @@ document.addEventListener("keydown", (e) => {
   if (e.code == "KeyP" && mouseHover) {
     togglePause();
   }
+  if (e.code == "KeyP" && e.ctrlKey) {
+    e.preventDefault();
+    setPaused();
+  }
 });
 document.addEventListener("keyup", (e) => {if (mouseHover) keys[e.code] = false;});
 
 canvas.addEventListener("mousedown", (e) => {
-  canvas.requestPointerLock();
+  if (document.hasFocus()) 
+    canvas.requestPointerLock()
+    document.getElementById("doNothing").focus();
+    textAreaFocused = false;
 });
 canvas.addEventListener("mouseenter", (e) => {
-  mouseHover = true;
-  document.getElementById("doNothing").focus();
-  textAreaFocused = false;
+  if (!textAreaFocused) {
+    document.getElementById("doNothing").focus();
+    mouseHover = true;
+  }
   // canvas.focus();
 });
 canvas.addEventListener("mouseleave", (e) => {mouseHover = false; keys = {};});
+
 document.addEventListener("pointerlockchange", (e) => {
   mouseLocked = Boolean(document.pointerLockElement);
   if (mouseLocked) mouseHover = true;

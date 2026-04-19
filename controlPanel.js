@@ -2,11 +2,12 @@ function update(param, value) {
   param = param.id;
   options[param] = value;
   if (displays[param]) displays[param].innerText = value;
-  if (running) saveOptions();
+  saveOptions();
 }
 
 let displays = {};
 let config;
+let editing = "";
 const userCode = document.getElementById("userCode");
 
 document.addEventListener("DOMContentLoaded", (e) => {
@@ -15,14 +16,12 @@ document.addEventListener("DOMContentLoaded", (e) => {
   for (let display of alldisplays) {
     displays[display.attributes.ref.value] = display;
   }
+  loadOptions();
   let settings = document.getElementsByClassName("setting");
-  // // console.log(settings);
   for (let setting of settings) {
-    // update(setting, setting.value);
     if (setting.oninput) setting.oninput();
     if (setting.onchange) setting.onchange();
   }
-  loadOptions();
 });
 
 function togglePannel() {
@@ -34,40 +33,32 @@ function togglePannel() {
 }
 
 function fullscreenPannel() {
-  if (config.style.width == Math.floor(window.innerWidth - 50) + "px") { // && config.style.height == Math.floor(window.innerHeight - 50) + "px"
+  if (config.style.width == Math.floor(window.innerWidth - 50) + "px") {
     config.style.width = "0px";
-    // config.style.height = "0px";
   } else {
     config.style.width = Math.floor(window.innerWidth - 50) + "px";
-    // config.style.height = Math.floor(window.innerHeight - 50) + "px";
   }
 }
 
 function togglePause() {
   let paused = document.getElementById("paused");
-  let button = document.getElementById("pauseButton")
   running = !running;
   displays.paused.innerText = !running;
   if (running) {
     paused.style.display = "none";
-    button.innerText = "pause";
   } else {
     paused.style.display = "block";
-    button.innerText = "play";
   }
 }
 
 function setPaused(pause = true) {
   let paused = document.getElementById("paused");
-  let button = document.getElementById("pauseButton")
   running = !pause;
   displays.paused.innerText = !running;
   if (running) {
     paused.style.display = "none";
-    button.innerText = "pause";
   } else {
     paused.style.display = "block";
-    button.innerText = "play";
   }
 }
 
@@ -79,10 +70,11 @@ function setSlidersToValues() {
   let smooth = document.getElementById("smooth");
   let isoCam = document.getElementById("isoCam");
   let moveSpeed = document.getElementById("moveSpeed");
-  let sbs3d = document.getElementById("sbs3d");
-  let anaglyph3d = document.getElementById("anaglyph3d");
+  let stereoscopy = document.getElementById("stereoscopy");
   let flipEyes = document.getElementById("flipEyes");
   let eyeDist = document.getElementById("eyeDist");
+  let glitchVis = document.getElementById("glitchVis");
+  
   resModifier.value = Math.log2(options.resModifier);
   renderDist.value = Math.log2(options.renderDist);
   worldRes.value = Math.log2(options.worldRes);
@@ -90,31 +82,26 @@ function setSlidersToValues() {
   smooth.checked = options.smooth;
   isoCam.checked = options.isoCam;
   moveSpeed.value = Math.log2(options.moveSpeed);
-  sbs3d.checked = options.sbs3d;
-  anaglyph3d.checked = options.anaglyph3d;
+  stereoscopy.checked = options.stereoscopy;
   flipEyes.checked = options.flipEyes;
   eyeDist.value = options.eyeDist;
+  glitchVis.checked = options.glitchVis;
+  
   resModifier.oninput();
   renderDist.oninput();
   worldRes.oninput();
   fov.oninput();
-  // smooth.onchange();
-  // isoCam.onchange();
+  isoCam.onchange();
   moveSpeed.oninput();
-  sbs3d.oninput();
-  anaglyph3d.oninput();
-  flipEyes.oninput();
   eyeDist.oninput();
 }
 
-function panic() {
-  setPaused();
-  let resSlider = document.getElementById("resModifier");
-  let distSlider = document.getElementById("renderDist");
-  resSlider.value = resSlider.min;
-  distSlider.value = distSlider.min;
-  resSlider.oninput();
-  distSlider.oninput();
+function toggleElement(elemName) {
+  let elem = document.getElementById(elemName);
+  if (elem.style.display == "none")
+    elem.style.display = "block";
+  else
+    elem.style.display = "none";
 }
 
 function saveOptions() {
@@ -123,64 +110,70 @@ function saveOptions() {
 
 function loadOptions() {
   try {
-    let savedOptions = JSON.parse(localStorage.getItem("VXEoptions"))
+    let savedOptions = JSON.parse(localStorage.getItem("VXEoptions"));
     if (savedOptions) {
-      options = savedOptions;
+      for (option in savedOptions) {
+        options[option] = savedOptions[option];
+      }
+      options.glitchVis = false; // makes it fix on refresh
       setSlidersToValues();
     }
-    // setPaused(false);
   } catch(err) {
     console.error(err);
   }
-  // resetPos();
-  // resetRot();
 }
 
+// code functions
 function quickLoadCode() { // init
   let code = localStorage.getItem("VXEautosave");
   if (code == null) {
     code = fshaderSplit[1];
   }
   userCode.value = code;
-  if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "unnamed");
-  // TODO make default instead of unnamed
-  displays.currentFile.innerText = localStorage.getItem("VXEediting");
+  if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "_default");
+  editing = localStorage.getItem("VXEediting")
+  displays.currentFile.innerText = editing;
 }
 
 function quickSaveCode() {
+  localStorage.setItem("VXEediting", editing);
   localStorage.setItem("VXEautosave", userCode.value);
 }
 
-const sysFiles = ["default", "list", "rlist"]; 
-const examples = ["blank", "graph2d", "graph3d", "sdfexample", "world"];
-// TODO make example files to load from
-let ownFiles = [];
+let examples = [];
 
-function loadCode() {
+async function fetchExamples() {
+  let exampleFile = await fetch("./examples/examples.txt", {cache: "no-store"}).then((response) => response.text());
+  examples = exampleFile.split("\n");
+}
+fetchExamples();
+
+async function loadCode() {
   keys = {};
-  let loadedFileName = prompt("Enter name for program (type 'list' for list):");
+  let loadedFileName = prompt("Enter name for program (type \"_list\" for list):");
   if (!loadedFileName) {
     return;
   }
-  if (loadedFileName == "list" || loadedFileName == "rlist") {
-    let programs = JSON.parse(localStorage.getItem("VXEprograms"));
-    if (programs == null || loadedFileName == "rlist") {
-      refreshList();
-    }
-    alert(localStorage.getItem("VXEprograms"));
-    // alert(programs);
+  if (loadedFileName == "_list") {
+    let programs = getPrograms();
+    alert(programs.join(" "));
+    loadCode();
     return;
-  } else if (loadedFileName == "default") {
+  } else if (loadedFileName == "_default") {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }
     userCode.value = fshaderSplit[1];
-  } else if (examples.includes(loadedFileName)) {
-    loadExample(loadedFileName);
-    return;
-  } else if (sysFiles.includes(loadedFileName)) {
-    alert("unavailable");
-    return;
+  } else if (loadedFileName[0] == "_") {
+    let code = await loadExample(loadedFileName);
+    if (!code.ok) {
+      alert("not found");
+      return;
+    }
+    if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
+      return;
+    }
+    userCode.value = code.code;
   } else {
     let code = localStorage.getItem("VXEP" + loadedFileName);
     if (!code) {
@@ -192,27 +185,28 @@ function loadCode() {
     }
     userCode.value = code;
   }
-  localStorage.setItem("VXEediting", loadedFileName);
-  displays.currentFile.innerText = localStorage.getItem("VXEediting");
+  editing = loadedFileName;
+  localStorage.setItem("VXEediting", editing);
+  displays.currentFile.innerText = editing;
   compileProgram();
 }
 
 async function loadExample(example) {
-  userCode.value = await fetch("./examples/" + example + ".glsl", {cache: "no-store"}).then((response) => response.text());
-  localStorage.setItem("VXEediting", example);
-  displays.currentFile.innerText = localStorage.getItem("VXEediting");
-  compileProgram();
+  let code = await fetch("./examples/" + example.slice(1) + ".glsl", {cache: "no-store"});
+  if (!code.ok)
+    return {ok: false, code: ""};
+  code = await code.text();
+  return {ok: true, code: code};
 }
 
 function saveCode() {
   quickSaveCode();
-  let currentFile = localStorage.getItem("VXEediting");
-  if (sysFiles.includes(currentFile)) {
-  // if (currentFile == "default") {
-    saveCodeAs();
+  let currentFile = editing;
+  if (currentFile[0] == "_") {
+    saveCodeAs(currentFile.slice(1));
     return;
   }
-  if (sysFiles.includes(currentFile) || examples.includes(currentFile)) {
+  if (!currentFile) {
     saveCodeAs();
     return;
   }
@@ -221,30 +215,36 @@ function saveCode() {
 
 function saveCodeAs(name) {
   keys = {};
-  let loadedFileName
+  let loadedFileName;
   if (name) {
     loadedFileName = name;
   } else {
     loadedFileName = prompt("Enter name for program:");
   }
-  let programs = JSON.parse(localStorage.getItem("VXEprograms"));
-  if (programs == null) {
-    refreshList();
-  }
-  if (!loadedFileName || sysFiles.includes(loadedFileName) || examples.includes(loadedFileName)) {
-    alert("name unavailable");
+  let programs = getPrograms();
+  if (!loadedFileName) {
+    alert("must have name");
     return;
   }
-  if (programs.includes(loadedFileName) && !confirm("The program " + loadedFileName + " already exists, do you want to overwrite it?")) {
+  if (loadedFileName == "_list") {
+    let programs = getPrograms();
+    alert(programs.join(" "));
+    saveCodeAs();
     return;
+  }
+  if (loadedFileName[0] == "_") {
+    alert("reserved for examples!");
+    return;
+  }
+  if (programs.includes(loadedFileName)) {
+    if (!confirm("The program " + loadedFileName + " already exists, do you want to overwrite it?"))
+      return;
   } else if (!confirm("Confirm saving " + loadedFileName)) {
     return;
   }
-  localStorage.setItem("VXEediting", loadedFileName);
-  displays.currentFile.innerText = localStorage.getItem("VXEediting");
-  if (!programs.includes(loadedFileName)) programs.push(loadedFileName); // only add if not yet in
-  programs.sort();
-  localStorage.setItem("VXEprograms", JSON.stringify(programs));
+  editing = loadedFileName;
+  localStorage.setItem("VXEediting", editing);
+  displays.currentFile.innerText = editing;
   saveCode();
 }
 
@@ -263,8 +263,9 @@ function importCode() {
       reader.readAsText(file);
       reader.onload = function(event) {
         userCode.value = event.target.result;
-        localStorage.setItem("VXEediting", filename[0]);
-        displays.currentFile.innerText = localStorage.getItem("VXEediting");
+        editing = filename[0]
+        localStorage.setItem("VXEediting", editing);
+        displays.currentFile.innerText = editing;
         saveCode();
         compileProgram();
       }
@@ -277,23 +278,24 @@ function importCode() {
 
 function exportCode() {
   keys = {};
-  let filename = localStorage.getItem("VXEediting") + ".glsl";
+  let filename = editing + ".glsl";
+  localStorage.setItem("VXEediting", editing);
   let fileContent = userCode.value;
   let file = new Blob([fileContent], {type: "text/plain"});
   saveBlob(file, filename);
 }
 
-function refreshList() {
+function getPrograms() {
   programs = [];
   for (let key of Object.keys(localStorage)) {
     if (key.slice(0, 4) == "VXEP") {
       programs.push(key.slice(4));
     }
   }
-  programs.push("default");
+  programs.push("_default");
   for (let example of examples) {
-    programs.push(example);
+    programs.push("_" + example);
   }
   programs.sort();
-  localStorage.setItem("VXEprograms", JSON.stringify(programs));
+  return programs;
 }
