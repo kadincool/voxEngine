@@ -9,6 +9,7 @@ let displays = {};
 let config;
 let editing = "";
 const userCode = document.getElementById("userCode");
+let userCodeContext;
 
 document.addEventListener("DOMContentLoaded", (e) => {
   config = document.getElementById("config");
@@ -21,6 +22,23 @@ document.addEventListener("DOMContentLoaded", (e) => {
   for (let setting of settings) {
     if (setting.oninput) setting.oninput();
     if (setting.onchange) setting.onchange();
+  }
+  if (CodeMirror) {
+      userCodeContext = CodeMirror.fromTextArea(userCode, {
+      lineNumbers: true, 
+      theme: "transparent", 
+      foldGutter: true, 
+      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"], 
+      fixedGutter: false, 
+      tabSize: 2,
+      smartIndent: false,
+      indentWithTabs: true, // high on that tab milk babyyyy
+      extraKeys: {"Ctrl-/": "toggleComment"}
+    });
+    userCodeContext.on("focus", (e) => {
+      textAreaFocused = true;
+      keys = {};
+    });
   }
 });
 
@@ -129,7 +147,10 @@ function quickLoadCode() { // init
   if (code == null) {
     code = fshaderSplit[1];
   }
-  userCode.value = code;
+  if (userCodeContext)
+    userCodeContext.setValue(code);
+  else
+    userCode.value = code;
   if (!localStorage.getItem("VXEediting")) localStorage.setItem("VXEediting", "_default");
   editing = localStorage.getItem("VXEediting")
   displays.currentFile.innerText = editing;
@@ -137,7 +158,10 @@ function quickLoadCode() { // init
 
 function quickSaveCode() {
   localStorage.setItem("VXEediting", editing);
-  localStorage.setItem("VXEautosave", userCode.value);
+  if (userCodeContext)
+    localStorage.setItem("VXEautosave", userCodeContext.getValue());
+  else
+    localStorage.setItem("VXEautosave", userCode.value);
 }
 
 let examples = [];
@@ -159,11 +183,17 @@ async function loadCode() {
     alert(programs.join(" "));
     loadCode();
     return;
+  } else if (loadedFileName == "_delete") {
+    deleteCode(); 
+    return;
   } else if (loadedFileName == "_default") {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }
-    userCode.value = fshaderSplit[1];
+    if (userCodeContext)
+      userCodeContext.setValue(fshaderSplit[1]);
+    else
+      userCode.value = fshaderSplit[1];
   } else if (loadedFileName[0] == "_") {
     let code = await loadExample(loadedFileName);
     if (!code.ok) {
@@ -173,7 +203,10 @@ async function loadCode() {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }
-    userCode.value = code.code;
+    if (userCodeContext)
+      userCodeContext.setValue(code.code);
+    else
+      userCode.value = code.code;
   } else {
     let code = localStorage.getItem("VXEP" + loadedFileName);
     if (!code) {
@@ -183,7 +216,10 @@ async function loadCode() {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
     }
-    userCode.value = code;
+    if (userCodeContext)
+      userCodeContext.setValue(code);
+    else
+      userCode.value = code;
   }
   editing = loadedFileName;
   localStorage.setItem("VXEediting", editing);
@@ -210,42 +246,80 @@ function saveCode() {
     saveCodeAs();
     return;
   }
-  localStorage.setItem("VXEP" + currentFile, userCode.value);
+  if (userCodeContext)
+    localStorage.setItem("VXEP" + currentFile, userCodeContext.getValue());
+  else
+    localStorage.setItem("VXEP" + currentFile, userCode.value);
 }
 
 function saveCodeAs(name) {
   keys = {};
-  let loadedFileName;
+  let savedFileName;
   if (name) {
-    loadedFileName = name;
+    savedFileName = name;
   } else {
-    loadedFileName = prompt("Enter name for program:");
+    savedFileName = prompt("Enter name for program:");
   }
   let programs = getPrograms();
-  if (!loadedFileName) {
+  if (!savedFileName) {
     alert("must have name");
     return;
   }
-  if (loadedFileName == "_list") {
+  if (savedFileName == "_list") {
     let programs = getPrograms();
     alert(programs.join(" "));
     saveCodeAs();
     return;
   }
-  if (loadedFileName[0] == "_") {
+  if (savedFileName[0] == "_") {
     alert("reserved for examples!");
     return;
   }
-  if (programs.includes(loadedFileName)) {
-    if (!confirm("The program " + loadedFileName + " already exists, do you want to overwrite it?"))
+  if (programs.includes(savedFileName)) {
+    if (!confirm("The program " + savedFileName + " already exists, do you want to overwrite it?"))
       return;
-  } else if (!confirm("Confirm saving " + loadedFileName)) {
+  } else if (!confirm("Confirm saving " + savedFileName)) {
     return;
   }
-  editing = loadedFileName;
+  editing = savedFileName;
   localStorage.setItem("VXEediting", editing);
   displays.currentFile.innerText = editing;
   saveCode();
+}
+
+function deleteCode() {
+  keys = {};
+  let deletedFileName = prompt("Enter name of program to delete:");
+  if (!deletedFileName) {
+    alert("Deletion cancelled!");
+    return;
+  }
+  if (deletedFileName == "_list") {
+    let programs = getPrograms();
+    alert(programs.join(" "));
+    deleteCode();
+    return;
+  }
+  if (deletedFileName[0] == "_") {
+    alert("Cannot delete!");
+    return;
+  }
+  if (localStorage.getItem("VXEP" + deletedFileName)) {
+    let signature = prompt(`File "${deletedFileName}" will be deleted and unrecoverable. Type \"delete\" to confirm deletion.`);
+    if (signature == "delete") {
+      localStorage.removeItem("VXEP" + deletedFileName);
+      alert(`File "${deletedFileName}" has been deleted.`);
+      return;
+    } else if (!signature) {
+      alert("Deletion cancelled!");
+      return;
+    } else {
+      alert(`Signature failed, expected "delete", got "${signature}"!`)
+    }
+  } else {
+    alert("Cannot find file!");
+    return;
+  }
 }
 
 function importCode() {
@@ -280,7 +354,11 @@ function exportCode() {
   keys = {};
   let filename = editing + ".glsl";
   localStorage.setItem("VXEediting", editing);
-  let fileContent = userCode.value;
+  let fileContent;
+  if (userCodeContext)
+    fileContent = userCodeContext.getValue();
+  else
+    fileContent = userCode.value;
   let file = new Blob([fileContent], {type: "text/plain"});
   saveBlob(file, filename);
 }

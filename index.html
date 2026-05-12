@@ -1,4 +1,21 @@
 <!DOCTYPE html>
+<!-- CodeMirror -->
+<script src="./codeMirror/lib/codemirror.js"></script>
+<link rel="stylesheet" href="./codeMirror/lib/codemirror.css">
+<!-- Code Folding -->
+<script src="./codeMirror/addon/fold/foldcode.js"></script>
+<script src="./codeMirror/addon/fold/foldgutter.js"></script>
+<script src="./codeMirror/addon/fold/brace-fold.js"></script>
+<link rel="stylesheet" href="./codeMirror/addon/fold/foldgutter.css" />
+<!-- other misc -->
+<script src="./codeMirror/addon/comment/comment.js"></script>
+<link href="./codeMirror/transparent.css" rel="stylesheet">
+<script src="./codeMirror/mode/clike/clike.js"></script>
+<!-- <link rel="stylesheet" href="./theme/the-matrix.css"> -->
+<!-- <link rel="stylesheet" href="./sample-theme.css"> -->
+
+<!--<script src="./codeMirror/codeMirrorCombined.js"></script>
+<link href="./codeMirror/codeMirrorCombined.css" rel="stylesheet">-->
 <link href="./style.css" rel="stylesheet">
 <canvas id="glCanvas"></canvas>
 <div id="paused" style="display: none;">
@@ -86,7 +103,7 @@
       <p><span class="clickable" onclick=importCode()>[📥 Import...]</span> <span class="clickable" onclick=exportCode()>[📤 Export...]</span></p>
     </div>
     <div id="errorList"></div>
-    <textarea spellcheck="false" id="userCode" autocomplete="off"></textarea>
+    <div id="userCodeWrapper"><textarea spellcheck="false" id="userCode" autocomplete="off"></textarea></div>
   </div>
 </div>
 <button id="doNothing"></button>

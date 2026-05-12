@@ -72,7 +72,10 @@ async function fetchFiles() {
 
 function compileProgram() {
   quickSaveCode();
-  fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
+  if (userCodeContext)
+    fshaderSrc = fshaderSplit[0] + userCodeContext.getValue() + fshaderSplit[2];
+  else
+    fshaderSrc = fshaderSplit[0] + userCode.value + fshaderSplit[2];
   makeShaderProgram();
   setPaused(false);
 }
@@ -335,7 +338,14 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.code == "KeyS" && e.ctrlKey) {
     e.preventDefault();
-    saveCode();
+    if (e.shiftKey)
+      saveCodeAs();
+    else
+      saveCode();
+  }
+  if (e.code == "KeyL" && e.ctrlKey) {
+    e.preventDefault();
+    loadCode();
   }
   if (e.code == "Space" && e.ctrlKey) {
     e.preventDefault();
