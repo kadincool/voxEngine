@@ -1,0 +1,25 @@
+.cm-s-transparent.CodeMirror { background: #0000007f; color: white; }
+.cm-s-transparent div.CodeMirror-selected { background: #0000007f; }
+.cm-s-transparent .CodeMirror-line::selection, .cm-s-transparent .CodeMirror-line > span::selection, .cm-s-transparent .CodeMirror-line > span > span::selection { background: rgba(45, 45, 45, 0.99); }
+.cm-s-transparent .CodeMirror-line::-moz-selection, .cm-s-transparent .CodeMirror-line > span::-moz-selection, .cm-s-transparent .CodeMirror-line > span > span::-moz-selection { background: rgba(45, 45, 45, 0.99); }
+.cm-s-transparent .CodeMirror-gutters { background: #0000007f; border-right: 2px solid #fff; }
+.cm-s-transparent .CodeMirror-guttermarker { color: #0f0; }
+.cm-s-transparent .CodeMirror-guttermarker-subtle { color: white; }
+.cm-s-transparent .CodeMirror-linenumber { color: #FFFFFF; }
+.cm-s-transparent .CodeMirror-cursor { border-left: 1px solid #fff; }
+
+.cm-s-transparent span.cm-comment { color: #AFAFAF; }
+
+.CodeMirror-linenumber {
+  min-width: 0;
+}
+
+.CodeMirror-foldmarker {
+  color: white;
+  text-shadow: none;
+}
+
+.CodeMirror {
+  /* Set height, width, borders, and global font properties here */
+  height: 100%;
+}
