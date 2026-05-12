@@ -338,7 +338,14 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.code == "KeyS" && e.ctrlKey) {
     e.preventDefault();
-    saveCode();
+    if (e.shiftKey)
+      saveCodeAs();
+    else
+      saveCode();
+  }
+  if (e.code == "KeyL" && e.ctrlKey) {
+    e.preventDefault();
+    loadCode();
   }
   if (e.code == "Space" && e.ctrlKey) {
     e.preventDefault();

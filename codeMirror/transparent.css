@@ -8,6 +8,8 @@
 .cm-s-transparent .CodeMirror-linenumber { color: #FFFFFF; }
 .cm-s-transparent .CodeMirror-cursor { border-left: 1px solid #fff; }
 
+.cm-s-transparent span.cm-comment { color: #AFAFAF; }
+
 .CodeMirror-linenumber {
   min-width: 0;
 }

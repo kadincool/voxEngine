@@ -32,6 +32,8 @@ document.addEventListener("DOMContentLoaded", (e) => {
       fixedGutter: false, 
       tabSize: 2,
       smartIndent: false,
+      indentWithTabs: true, // high on that tab milk babyyyy
+      extraKeys: {"Ctrl-/": "toggleComment"}
     });
     userCodeContext.on("focus", (e) => {
       textAreaFocused = true;
@@ -181,6 +183,9 @@ async function loadCode() {
     alert(programs.join(" "));
     loadCode();
     return;
+  } else if (loadedFileName == "_delete") {
+    deleteCode(); 
+    return;
   } else if (loadedFileName == "_default") {
     if (!confirm("Are you sure you want to load? (unsaved progress will be lost)")) {
       return;
@@ -249,37 +254,72 @@ function saveCode() {
 
 function saveCodeAs(name) {
   keys = {};
-  let loadedFileName;
+  let savedFileName;
   if (name) {
-    loadedFileName = name;
+    savedFileName = name;
   } else {
-    loadedFileName = prompt("Enter name for program:");
+    savedFileName = prompt("Enter name for program:");
   }
   let programs = getPrograms();
-  if (!loadedFileName) {
+  if (!savedFileName) {
     alert("must have name");
     return;
   }
-  if (loadedFileName == "_list") {
+  if (savedFileName == "_list") {
     let programs = getPrograms();
     alert(programs.join(" "));
     saveCodeAs();
     return;
   }
-  if (loadedFileName[0] == "_") {
+  if (savedFileName[0] == "_") {
     alert("reserved for examples!");
     return;
   }
-  if (programs.includes(loadedFileName)) {
-    if (!confirm("The program " + loadedFileName + " already exists, do you want to overwrite it?"))
+  if (programs.includes(savedFileName)) {
+    if (!confirm("The program " + savedFileName + " already exists, do you want to overwrite it?"))
       return;
-  } else if (!confirm("Confirm saving " + loadedFileName)) {
+  } else if (!confirm("Confirm saving " + savedFileName)) {
     return;
   }
-  editing = loadedFileName;
+  editing = savedFileName;
   localStorage.setItem("VXEediting", editing);
   displays.currentFile.innerText = editing;
   saveCode();
+}
+
+function deleteCode() {
+  keys = {};
+  let deletedFileName = prompt("Enter name of program to delete:");
+  if (!deletedFileName) {
+    alert("Deletion cancelled!");
+    return;
+  }
+  if (deletedFileName == "_list") {
+    let programs = getPrograms();
+    alert(programs.join(" "));
+    deleteCode();
+    return;
+  }
+  if (deletedFileName[0] == "_") {
+    alert("Cannot delete!");
+    return;
+  }
+  if (localStorage.getItem("VXEP" + deletedFileName)) {
+    let signature = prompt(`File "${deletedFileName}" will be deleted and unrecoverable. Type \"delete\" to confirm deletion.`);
+    if (signature == "delete") {
+      localStorage.removeItem("VXEP" + deletedFileName);
+      alert(`File "${deletedFileName}" has been deleted.`);
+      return;
+    } else if (!signature) {
+      alert("Deletion cancelled!");
+      return;
+    } else {
+      alert(`Signature failed, expected "delete", got "${signature}"!`)
+    }
+  } else {
+    alert("Cannot find file!");
+    return;
+  }
 }
 
 function importCode() {
